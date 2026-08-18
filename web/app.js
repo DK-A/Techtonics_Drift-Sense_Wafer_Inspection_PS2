@@ -470,11 +470,12 @@ async function reRunLocalizeCurrentPair() {
 function parseMarkdownToHtml(md) {
     if (!md) return '';
     return md
-        .replace(/^# (.*$)/gim, '<h3>$1</h3>')
-        .replace(/^### (.*$)/gim, '<h4>$1</h4>')
-        .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+        .replace(/^# (.*$)/gim, '<h2 style="font-size: 16px; color: #fff; margin-bottom: 8px;">$1</h2>')
+        .replace(/^## (.*$)/gim, '<h3 style="font-size: 14px; color: var(--accent-blue); margin-top: 12px; margin-bottom: 6px;">$1</h3>')
+        .replace(/^### (.*$)/gim, '<h4 style="font-size: 13px; color: var(--accent-amber); margin-top: 10px; margin-bottom: 4px;">$1</h4>')
+        .replace(/\*\*(.*?)\*\*/gim, '<strong style="color: #fff;">$1</strong>')
         .replace(/\*(.*?)\*/gim, '<em>$1</em>')
-        .replace(/`([^`]+)`/gim, '<code>$1</code>')
-        .replace(/^\- (.*$)/gim, '<li>$1</li>')
-        .replace(/\n$/gim, '<br />');
+        .replace(/`([^`]+)`/gim, '<code style="background: rgba(0,0,0,0.3); color: var(--accent-green); padding: 1px 5px; border-radius: 3px;">$1</code>')
+        .replace(/^[\*\-] (.*$)/gim, '<li style="margin-left: 20px; font-size: 12px; color: var(--text-secondary); margin-bottom: 3px;">$1</li>')
+        .replace(/\n\n/gim, '<br/><br/>');
 }
