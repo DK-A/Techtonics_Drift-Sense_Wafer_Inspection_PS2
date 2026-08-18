@@ -162,6 +162,27 @@ The localization engine combines frequency-domain normalized correlation with di
 6. **Phase 3 (Adaptive Fine Search)**: Localized window search ($160 \times 160\text{ px}$ to $240 \times 240\text{ px}$) sweeping sub-degree angles ($\pm 0.25^\circ$) and fine scale ($\pm 0.005$).
 7. **Phase 4 (Sub-Pixel Fourier Refinement)**: 2D Fourier Phase Correlation with 2D parabolic continuous peak interpolation.
 
+### 4.1 Deep Learning Model Specification (Phase 5 Siamese Re-Ranker)
+
+When dense periodic symmetries produce multiple competing candidates with nearly identical correlation scores, the cascade selectively invokes the **Phase 5 Siamese Metric Network**:
+
+```text
+                               PHASE 5 SIAMESE EMBEDDING NETWORK
+ 
+  Reference Patch (128x128) ──► [ Conv Block 1-4 + BN + ReLU + MaxPool ] ──► GAP ──► FC ──► 64D Unit Vector (z_ref)
+                                                                                                      │
+                                                                                               Cosine Similarity
+                                                                                                      ▼
+  Candidate Patch (128x128) ──► [ Conv Block 1-4 + BN + ReLU + MaxPool ] ──► GAP ──► FC ──► 64D Unit Vector (z_cand)
+```
+
+* **Model Checkpoint**: Stored in [`model/phase5_reranker.pt`](file:///f:/HACKATHONS/SEMICON/SEMICON_v1/submission/model/phase5_reranker.pt) (~3.2 MB lightweight footprint).
+* **Network Architecture**: 4-stage convolutional feature extractor ($32 \to 64 \to 128 \to 256$ channels) with Batch Normalization, ReLU activations, $2\times2$ Max Pooling, Global Average Pooling (GAP), and a linear projection layer outputting a 64-dimensional $L_2$-normalized unit embedding ($\|\mathbf{z}\|_2 = 1.0$).
+* **Training Objective**: Trained in [`train.py`](file:///f:/HACKATHONS/SEMICON/SEMICON_v1/submission/train.py) using **Contrastive Cosine Margin Loss**:
+  $$\mathcal{L}_{\text{contrastive}} = y \cdot (1 - \cos(\mathbf{z}_1, \mathbf{z}_2)) + (1 - y) \cdot \max(0, \cos(\mathbf{z}_1, \mathbf{z}_2) - m)^2, \quad m = 0.40$$
+  specifically mined on hard-negative pairs (adjacent repeating periodic columns/rows).
+* **Execution Mode**: Runs offline/CPU in real time ($\sim 15\text{ ms}$ per candidate crop) and is selectively activated only on ambiguous instances, preserving ultra-fast $672\text{ ms}$ overall throughput.
+
 ---
 
 ## 5. Comprehensive Experimental Results
