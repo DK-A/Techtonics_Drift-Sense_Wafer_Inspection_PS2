@@ -1,0 +1,11 @@
+# Temporary development files
+scratch/
+test_profile/
+dataset/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.DS_Store
+Thumbs.db
+*.tmp

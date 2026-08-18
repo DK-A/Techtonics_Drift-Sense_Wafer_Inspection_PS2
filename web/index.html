@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEMICON — SEM Pattern Localization & Metrology Suite</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-left">
+            <div class="logo-badge">
+                <span class="logo-icon">⚡</span>
+                <div class="logo-text">
+                    <h1>SEMICON Metrology Suite</h1>
+                    <span class="sub-text">Applied Materials Challenge | 5-Phase Cascade Localization</span>
+                </div>
+            </div>
+        </div>
+        <div class="header-center">
+            <div class="kpi-strip">
+                <div class="kpi-item">
+                    <span class="kpi-label">TOTAL PAIRS</span>
+                    <span class="kpi-val" id="kpi-total">120</span>
+                </div>
+                <div class="kpi-item highlight">
+                    <span class="kpi-label">PASS RATE (&lt;5px)</span>
+                    <span class="kpi-val text-pass" id="kpi-pass-rate">99.17%</span>
+                </div>
+                <div class="kpi-item">
+                    <span class="kpi-label">SUB-PIXEL (&lt;1px)</span>
+                    <span class="kpi-val" id="kpi-subpixel">85.0%</span>
+                </div>
+                <div class="kpi-item">
+                    <span class="kpi-label">MEAN ERROR</span>
+                    <span class="kpi-val" id="kpi-mean-err">1.190 px</span>
+                </div>
+                <div class="kpi-item">
+                    <span class="kpi-label">MEDIAN ERROR</span>
+                    <span class="kpi-val" id="kpi-median-err">0.692 px</span>
+                </div>
+                <div class="kpi-item">
+                    <span class="kpi-label">AVG RUNTIME</span>
+                    <span class="kpi-val" id="kpi-runtime">695 ms</span>
+                </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="view-switch-btns">
+                <button class="nav-tab active" id="tab-btn-inspector" onclick="switchMainTab('inspector')">Pair Inspector</button>
+                <button class="nav-tab" id="tab-btn-pipeline" onclick="switchMainTab('pipeline')">Pipeline Flow</button>
+                <button class="nav-tab" id="tab-btn-analytics" onclick="switchMainTab('analytics')">Analytics &amp; Plots</button>
+                <button class="nav-tab" id="tab-btn-collages" onclick="switchMainTab('collages')">Pattern Collages</button>
+                <button class="nav-tab" id="tab-btn-failure" onclick="switchMainTab('failure')">Failure Diagnostic</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="app-main">
+        <!-- VIEW 1: PAIR INSPECTOR -->
+        <section id="view-inspector" class="main-view active">
+            <!-- LEFT SIDEBAR: PAIR LIST & FILTERS -->
+            <aside class="sidebar-pairs">
+                <div class="filter-controls">
+                    <div class="search-box">
+                        <input type="text" id="filter-search" placeholder="Search by Pair ID, Pattern..." oninput="applyFilters()">
+                    </div>
+                    <div class="filter-row">
+                        <select id="filter-pattern" onchange="applyFilters()">
+                            <option value="ALL">All Patterns (P1–P8)</option>
+                            <option value="FIN_ARRAY">P1: FIN_ARRAY</option>
+                            <option value="FIN_CUT">P2: FIN_CUT</option>
+                            <option value="FIN_GATE">P3: FIN_GATE</option>
+                            <option value="CONTACT_ARRAY">P4: CONTACT_ARRAY</option>
+                            <option value="LOCAL_INTERCONNECT">P5: LOCAL_INTERCONNECT</option>
+                            <option value="METAL_ROUTING">P6: METAL_ROUTING</option>
+                            <option value="ACTIVE_CELL">P7: ACTIVE_CELL</option>
+                            <option value="FINFET_FULL_CELL">P8: FINFET_FULL_CELL</option>
+                        </select>
+                        <select id="filter-stress" onchange="applyFilters()">
+                            <option value="ALL">All Stress Tiers</option>
+                            <option value="NOISE_ROBUSTNESS">Noise Series (Low-Severe)</option>
+                            <option value="POSITION_ROBUSTNESS">Position / Corner Off-Center</option>
+                            <option value="SCALE_ROBUSTNESS">Multi-Scale (0.091–0.111)</option>
+                            <option value="ROTATION_ROBUSTNESS">Rotation (±2.0°)</option>
+                            <option value="DRIFT_ROBUSTNESS">Stage Drift (±11px)</option>
+                            <option value="PERIODIC_AMBIGUITY">Periodic Ambiguity</option>
+                            <option value="MIXED_STRESS">Mixed Multi-Stress</option>
+                        </select>
+                    </div>
+                    <div class="filter-tags">
+                        <button class="tag-btn active" data-status="ALL" onclick="setStatusFilter('ALL', this)">All (120)</button>
+                        <button class="tag-btn" data-status="SUBPIXEL" onclick="setStatusFilter('SUBPIXEL', this)">&lt;1.0 px</button>
+                        <button class="tag-btn" data-status="PASS" onclick="setStatusFilter('PASS', this)">&lt;5.0 px Pass</button>
+                        <button class="tag-btn" data-status="OUTLIER" onclick="setStatusFilter('OUTLIER', this)">Multiple Matches</button>
+                    </div>
+                </div>
+
+                <div class="pair-list-container" id="pair-list">
+                    <!-- Dynamic Pair Cards Rendered via JS -->
+                </div>
+            </aside>
+
+            <!-- CENTER WORKSPACE: INTERACTIVE VISUAL INSPECTION -->
+            <section class="workspace-inspector">
+                <div class="workspace-top-bar">
+                    <div class="selected-pair-title">
+                        <span class="badge-pid" id="detail-pid">PAIR_001</span>
+                        <span class="badge-pname" id="detail-pname">P1: FIN_ARRAY</span>
+                        <span class="badge-status pass" id="detail-status-badge">PASS &bull; 0.206 px</span>
+                    </div>
+                    <div class="display-toggle-bar">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-gt" checked onchange="updateCanvasOverlay()">
+                            <span>Ground Truth (Green Box)</span>
+                        </label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-pred" checked onchange="updateCanvasOverlay()">
+                            <span>Prediction (Yellow Cross)</span>
+                        </label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-vector" checked onchange="updateCanvasOverlay()">
+                            <span>Error Vector</span>
+                        </label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-clahe" onchange="toggleClahePreview()">
+                            <span>CLAHE Normalization</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 3-PANEL VISUAL DISPLAY GRID -->
+                <div class="visual-tri-grid">
+                    <!-- PANEL 1: FULL SEARCH FIELD (1000x1000) -->
+                    <div class="vis-panel main-panel">
+                        <div class="panel-header">
+                            <span class="panel-title">1. Search Field (1000 &times; 1000)</span>
+                            <span class="panel-meta" id="panel-search-meta">Low-Mag SEM Field</span>
+                        </div>
+                        <div class="canvas-wrapper" id="canvas-container">
+                            <img id="img-search" src="" alt="Search Field" crossorigin="anonymous">
+                            <canvas id="overlay-canvas" width="1000" height="1000"></canvas>
+                            <div id="inference-loading-overlay" class="loading-overlay">
+                                <div class="spinner"></div>
+                                <span>Running 5-Phase Cascade Live...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PANEL 2: HIGH-MAG REFERENCE TEMPLATE (1000x1000) -->
+                    <div class="vis-panel">
+                        <div class="panel-header">
+                            <span class="panel-title">2. Reference Template (1000 &times; 1000)</span>
+                            <span class="panel-meta">High-Mag Template</span>
+                        </div>
+                        <div class="img-preview-box">
+                            <img id="img-ref" src="" alt="Reference Image">
+                        </div>
+                    </div>
+
+                    <!-- PANEL 3: ZOOMED TARGET AREA (250x250) -->
+                    <div class="vis-panel">
+                        <div class="panel-header">
+                            <span class="panel-title">3. Sub-Pixel Target Zoom</span>
+                            <span class="panel-meta" id="panel-zoom-meta">GT vs Pred Alignment</span>
+                        </div>
+                        <div class="img-preview-box zoom-box">
+                            <canvas id="zoom-canvas" width="250" height="250"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RIGHT SIDEBAR: DETAILED METROLOGY & DIAGNOSTIC PARAMETERS -->
+            <aside class="sidebar-details">
+                <div class="detail-section">
+                    <h3>Localization Coordinates</h3>
+                    <table class="detail-table">
+                        <tr>
+                            <td>Ground Truth (GT)</td>
+                            <td class="font-mono text-success" id="val-gt-coord">(499.58, 500.39) px</td>
+                        </tr>
+                        <tr>
+                            <td>Predicted Center</td>
+                            <td class="font-mono text-primary" id="val-pred-coord">(499.55, 500.60) px</td>
+                        </tr>
+                        <tr>
+                            <td>Euclidean Error</td>
+                            <td class="font-mono font-bold" id="val-error-px">0.206 px</td>
+                        </tr>
+                        <tr>
+                            <td>X / Y Component Shift</td>
+                            <td class="font-mono" id="val-dx-dy">dx: -0.02 px | dy: +0.20 px</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="detail-section">
+                    <h3>Cascade Execution Metrics</h3>
+                    <table class="detail-table">
+                        <tr>
+                            <td>Cascade Path Used</td>
+                            <td><span class="badge-stage" id="val-stage">ncc_direct</span></td>
+                        </tr>
+                        <tr>
+                            <td>Confidence Score</td>
+                            <td class="font-mono font-bold" id="val-confidence">0.9518 (HIGH)</td>
+                        </tr>
+                        <tr>
+                            <td>Execution Latency</td>
+                            <td class="font-mono" id="val-runtime">675.2 ms</td>
+                        </tr>
+                        <tr>
+                            <td>Scale / Angle Solved</td>
+                            <td class="font-mono" id="val-scale-angle">Scale: 0.1000 | Angle: +0.25°</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="detail-section">
+                    <h3>SEM Physical Variations</h3>
+                    <table class="detail-table">
+                        <tr>
+                            <td>Stress Category</td>
+                            <td><span class="badge-stress" id="val-stress-cat">NOISE_ROBUSTNESS</span></td>
+                        </tr>
+                        <tr>
+                            <td>Noise Tier &amp; Dose</td>
+                            <td class="font-mono" id="val-noise-tier">LOW (Dose: 3500, &sigma;: 0.8)</td>
+                        </tr>
+                        <tr>
+                            <td>Spatial Region</td>
+                            <td class="font-mono" id="val-region">Arbitrary Interior</td>
+                        </tr>
+                        <tr>
+                            <td>Applied Stage Drift</td>
+                            <td class="font-mono" id="val-drift">0.00 px (dx: 0.0, dy: 0.0)</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="action-card">
+                    <button class="btn-primary" onclick="reRunLocalizeCurrentPair()">⚡ Re-Run Localization Live</button>
+                </div>
+            </aside>
+        </section>
+
+        <!-- VIEW: PIPELINE CASCADE FLOW & INTERFERENCE TELEMETRY -->
+        <section id="view-pipeline" class="main-view">
+            <div class="analytics-header">
+                <h2>5-Phase Cascade Pipeline Execution Flow</h2>
+                <p>Interactive architecture diagram and step-by-step inference telemetry showing candidate gating, ambiguity escalation, and sub-pixel Fourier refinement.</p>
+            </div>
+
+            <!-- PIPELINE FLOWCHART DIAGRAM -->
+            <div class="pipeline-stepper-container">
+                <div class="flow-step-card active">
+                    <div class="step-badge">STAGE 0</div>
+                    <h4>CLAHE Preprocessing</h4>
+                    <p>Adaptive secondary-electron illumination normalization and noise conditioning.</p>
+                    <div class="step-metrics">
+                        <span>Clip Limit: <code>2.0</code></span>
+                        <span>Grid: <code>8x8</code></span>
+                    </div>
+                </div>
+
+                <div class="flow-arrow">&rarr;</div>
+
+                <div class="flow-step-card active">
+                    <div class="step-badge">PHASE 1</div>
+                    <h4>Global Multi-Scale NCC</h4>
+                    <p>Sweeps 25 template variants (0.091–0.111 scale, ±2.0° angle) with NMS peak extraction.</p>
+                    <div class="step-metrics">
+                        <span>Variants: <code>25</code></span>
+                        <span>Gate Gate Threshold: <code>0.65</code></span>
+                    </div>
+                </div>
+
+                <div class="flow-arrow">&rarr;</div>
+
+                <div class="flow-decision-card" id="flow-decision-gate">
+                    <div class="decision-title">Confidence Gate &amp; Ambiguity Check</div>
+                    <div class="decision-routes">
+                        <div class="route-line direct">
+                            <span class="route-tag">&ge; 0.65 Gate Conf</span>
+                            <span class="route-dest">Fast Path &rarr; Phase 3 (95% Cases)</span>
+                        </div>
+                        <div class="route-line escalate">
+                            <span class="route-tag">&lt; 0.65 or Periodic Ambiguity</span>
+                            <span class="route-dest">Escalate &rarr; Phase 2 &amp; Phase 5</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flow-arrow">&rarr;</div>
+
+                <div class="flow-step-card" id="flow-card-p2">
+                    <div class="step-badge">PHASE 2 &amp; 5</div>
+                    <h4>Geometry &amp; Siamese ML</h4>
+                    <p>Sobel directional coherence, local SE contrast, and 128x128 canonical metric embedding re-ranking.</p>
+                    <div class="step-metrics">
+                        <span>Edge Coherence: <code>40%</code></span>
+                        <span>Contrast: <code>60%</code></span>
+                    </div>
+                </div>
+
+                <div class="flow-arrow">&rarr;</div>
+
+                <div class="flow-step-card active">
+                    <div class="step-badge">PHASE 3 &amp; 4</div>
+                    <h4>Fine Search &amp; Sub-Pixel</h4>
+                    <p>Adaptive window refinement and 2D Fourier Phase Correlation with parabolic sub-pixel peak interpolation.</p>
+                    <div class="step-metrics">
+                        <span>Fourier Refine: <code>&plusmn;0.05 px</code></span>
+                        <span>Window: <code>160–240px</code></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LIVE SELECTED PAIR INFERENCE TELEMETRY -->
+            <div class="telemetry-dashboard">
+                <div class="telemetry-header">
+                    <h3>Live Inference Trace for <span id="trace-pid" class="text-primary font-mono">PAIR_001</span> (<span id="trace-pname">FIN_ARRAY</span>)</h3>
+                    <span class="badge-stage" id="trace-path">ncc_direct</span>
+                </div>
+                <div class="telemetry-grid">
+                    <div class="telemetry-box">
+                        <h4>Phase 1: Coarse NCC Peak</h4>
+                        <div class="tele-item"><span>Peak Correlation Score:</span><code id="tel-p1-score">0.9518</code></div>
+                        <div class="tele-item"><span>Peak-to-Second Gap:</span><code id="tel-p1-gap">0.1018</code></div>
+                        <div class="tele-item"><span>Peak Sharpness (PSR):</span><code id="tel-p1-sharp">1.485</code></div>
+                        <div class="tele-item"><span>Calibrated Gate Conf:</span><code id="tel-p1-gate">0.7805 (&ge; 0.65)</code></div>
+                    </div>
+
+                    <div class="telemetry-box" id="tel-box-p2">
+                        <h4>Phase 2 &amp; Phase 5: Ambiguity Resolution</h4>
+                        <div class="tele-item"><span>Phase 2 Status:</span><code id="tel-p2-status">Bypassed (High Gate Confidence)</code></div>
+                        <div class="tele-item"><span>Directional Edge Score:</span><code id="tel-p2-edge">1.0000</code></div>
+                        <div class="tele-item"><span>Siamese Cosine Score:</span><code id="tel-p5-score">N/A</code></div>
+                        <div class="tele-item"><span>Selection Tiebreaker:</span><code id="tel-p5-tie">Feature-Score Ranking (No Center Bias)</code></div>
+                    </div>
+
+                    <div class="telemetry-box">
+                        <h4>Phase 3: Adaptive Fine Local Search</h4>
+                        <div class="tele-item"><span>Search Window Size:</span><code id="tel-p3-win">160 x 160 px</code></div>
+                        <div class="tele-item"><span>Fine Scale Solved:</span><code id="tel-p3-scale">0.1000 (Nominal 10:1)</code></div>
+                        <div class="tele-item"><span>Fine Angle Solved:</span><code id="tel-p3-angle">+0.25°</code></div>
+                        <div class="tele-item"><span>Fine Correlation Score:</span><code id="tel-p3-score">0.9618</code></div>
+                    </div>
+
+                    <div class="telemetry-box">
+                        <h4>Phase 4: Sub-Pixel Fourier Output</h4>
+                        <div class="tele-item"><span>Fourier Phase Correlation:</span><code>2D Phase Peak Interpolated</code></div>
+                        <div class="tele-item"><span>Sub-Pixel Shift (&delta;x, &delta;y):</span><code id="tel-p4-shift">-0.02 px, +0.20 px</code></div>
+                        <div class="tele-item"><span>Final Predicted Center:</span><code id="tel-p4-coord" class="text-primary font-bold">(499.55, 500.60) px</code></div>
+                        <div class="tele-item"><span>Sub-Pixel Accuracy Status:</span><code id="tel-p4-status" class="text-success font-bold">SUB-PIXEL PASS (0.206 px)</code></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 2: ANALYTICS & DIAGNOSTIC PLOTS -->
+        <section id="view-analytics" class="main-view">
+            <div class="analytics-header">
+                <h2>Benchmark Analytics &amp; Diagnostic Curves</h2>
+                <p>Comprehensive error cumulative distributions, precision-recall trade-offs, and multi-factor stress curves across all 120 pairs.</p>
+            </div>
+            <div class="plots-grid">
+                <div class="plot-card">
+                    <h3>Precision-Recall (PR) Curve</h3>
+                    <p class="plot-caption">PR curves across confidence thresholds for &lt;5.0px, &lt;2.0px, and &lt;1.0px accuracy tolerances with AP metrics.</p>
+                    <img src="/results/plots/precision_recall_curve.png" alt="Precision-Recall Curve" class="plot-img">
+                </div>
+                <div class="plot-card">
+                    <h3>Cumulative Distribution Function (CDF)</h3>
+                    <p class="plot-caption">Cumulative accuracy curve illustrating sharp sub-pixel concentration (&gt;85% &lt;1px).</p>
+                    <img src="/results/plots/error_cdf.png" alt="Error CDF" class="plot-img">
+                </div>
+                <div class="plot-card">
+                    <h3>Euclidean Error Distribution</h3>
+                    <p class="plot-caption">Histogram with Mean (1.19px), Median (0.69px), and P95 (1.20px) markers.</p>
+                    <img src="/results/plots/error_distribution.png" alt="Error Distribution" class="plot-img">
+                </div>
+                <div class="plot-card">
+                    <h3>Per-Pattern Error Breakdown (P1–P8)</h3>
+                    <p class="plot-caption">Mean and Median localization error across the 8 required semiconductor patterns.</p>
+                    <img src="/results/plots/pattern_error_bars.png" alt="Pattern Error Bars" class="plot-img">
+                </div>
+                <div class="plot-card">
+                    <h3>Controlled Noise vs. Error</h3>
+                    <p class="plot-caption">Physics-based monotonic error progression from Low to Severe SEM noise.</p>
+                    <img src="/results/plots/noise_vs_error.png" alt="Noise vs Error" class="plot-img">
+                </div>
+                <div class="plot-card">
+                    <h3>Spatial Position Heatmap</h3>
+                    <p class="plot-caption">Localization error distribution across 2D search field coordinates.</p>
+                    <img src="/results/plots/position_error_heatmap.png" alt="Position Heatmap" class="plot-img">
+                </div>
+                <div class="plot-card">
+                    <h3>Scale Multiplier vs. Error</h3>
+                    <p class="plot-caption">Performance across 0.091–0.111 magnification scaling range.</p>
+                    <img src="/results/plots/scale_vs_error.png" alt="Scale vs Error" class="plot-img">
+                </div>
+                <div class="plot-card">
+                    <h3>Rotation Angle vs. Error</h3>
+                    <p class="plot-caption">Invariance to angular misalignments across [-2.0°, +2.0°].</p>
+                    <img src="/results/plots/rotation_vs_error.png" alt="Rotation vs Error" class="plot-img">
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 3: PATTERN COLLAGES GALLERY -->
+        <section id="view-collages" class="main-view">
+            <div class="analytics-header">
+                <h2>4-Panel Diagnostic Collages (P1–P8)</h2>
+                <p>High-resolution collages showing Reference Template, Full Search Field, Zoomed Target, and Competing Hard Negative Ghost for every pattern.</p>
+            </div>
+            <div class="collages-grid">
+                <div class="collage-card">
+                    <h3>P1: FIN_ARRAY</h3>
+                    <img src="/results/plots/collages/collage_P1_FIN_ARRAY.png" alt="Collage P1" class="collage-img" onclick="openLightbox(this.src)">
+                </div>
+                <div class="collage-card">
+                    <h3>P2: FIN_CUT</h3>
+                    <img src="/results/plots/collages/collage_P2_FIN_CUT.png" alt="Collage P2" class="collage-img" onclick="openLightbox(this.src)">
+                </div>
+                <div class="collage-card">
+                    <h3>P3: FIN_GATE</h3>
+                    <img src="/results/plots/collages/collage_P3_FIN_GATE.png" alt="Collage P3" class="collage-img" onclick="openLightbox(this.src)">
+                </div>
+                <div class="collage-card">
+                    <h3>P4: CONTACT_ARRAY</h3>
+                    <img src="/results/plots/collages/collage_P4_CONTACT_ARRAY.png" alt="Collage P4" class="collage-img" onclick="openLightbox(this.src)">
+                </div>
+                <div class="collage-card">
+                    <h3>P5: LOCAL_INTERCONNECT</h3>
+                    <img src="/results/plots/collages/collage_P5_LOCAL_INTERCONNECT.png" alt="Collage P5" class="collage-img" onclick="openLightbox(this.src)">
+                </div>
+                <div class="collage-card">
+                    <h3>P6: METAL_ROUTING</h3>
+                    <img src="/results/plots/collages/collage_P6_METAL_ROUTING.png" alt="Collage P6" class="collage-img" onclick="openLightbox(this.src)">
+                </div>
+                <div class="collage-card">
+                    <h3>P7: ACTIVE_CELL</h3>
+                    <img src="/results/plots/collages/collage_P7_ACTIVE_CELL.png" alt="Collage P7" class="collage-img" onclick="openLightbox(this.src)">
+                </div>
+                <div class="collage-card">
+                    <h3>P8: FINFET_FULL_CELL</h3>
+                    <img src="/results/plots/collages/collage_P8_FINFET_FULL_CELL.png" alt="Collage P8" class="collage-img" onclick="openLightbox(this.src)">
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 4: WORST FAILURE CASE DIAGNOSTIC -->
+        <section id="view-failure" class="main-view">
+            <div class="analytics-header">
+                <h2>Worst-Case Failure Analysis &amp; Technical Root Cause</h2>
+                <p>Auditing the single documented outlier across all 120 benchmark pairs with full numerical and physical justification.</p>
+            </div>
+            <div class="failure-layout">
+                <div class="failure-visual-card">
+                    <h3>Visual Inspection Overlay</h3>
+                    <img src="/results/failure_case/failure_case_overlay.png" alt="Failure Case Overlay" class="failure-overlay-img" onclick="openLightbox(this.src)">
+                </div>
+                <div class="failure-report-card">
+                    <div id="failure-report-content">
+                        <h3>Technical Root Cause Summary</h3>
+                        <p>Loading failure report...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- LIGHTBOX MODAL -->
+    <div id="lightbox-modal" class="modal" onclick="closeLightbox()">
+        <span class="modal-close">&times;</span>
+        <img class="modal-content" id="lightbox-img" src="">
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

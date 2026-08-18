@@ -1,0 +1,103 @@
+{
+  "dataset_version": "v1.0-Frozen-Realistic",
+  "total_pairs": 1500,
+  "total_images": 3000,
+  "resolution": "1000x1000",
+  "splits": {
+    "train": {
+      "percentage": 80,
+      "base_pairs": 400,
+      "aug_pairs": 800,
+      "total_pairs": 1200,
+      "total_images": 2400
+    },
+    "val": {
+      "percentage": 10,
+      "base_pairs": 50,
+      "aug_pairs": 100,
+      "total_pairs": 150,
+      "total_images": 300
+    },
+    "test": {
+      "percentage": 10,
+      "base_pairs": 50,
+      "aug_pairs": 100,
+      "total_pairs": 150,
+      "total_images": 300
+    }
+  },
+  "pattern_allocation": {
+    "P1_FIN_ARRAY": {
+      "class_id": "P1",
+      "base_pairs": 56,
+      "aug_pairs": 111,
+      "total_pairs": 167,
+      "total_images": 334,
+      "periodicity": "Periodic"
+    },
+    "P2_FIN_CUT": {
+      "class_id": "P2",
+      "base_pairs": 55,
+      "aug_pairs": 111,
+      "total_pairs": 166,
+      "total_images": 332,
+      "periodicity": "Non-Periodic"
+    },
+    "P3_GATE_POLY": {
+      "class_id": "P3",
+      "base_pairs": 56,
+      "aug_pairs": 111,
+      "total_pairs": 167,
+      "total_images": 334,
+      "periodicity": "Periodic"
+    },
+    "P4_FIN_GATE": {
+      "class_id": "P4",
+      "base_pairs": 55,
+      "aug_pairs": 111,
+      "total_pairs": 166,
+      "total_images": 332,
+      "periodicity": "Non-Periodic"
+    },
+    "P5_CONTACT_ARRAY": {
+      "class_id": "P5",
+      "base_pairs": 56,
+      "aug_pairs": 111,
+      "total_pairs": 167,
+      "total_images": 334,
+      "periodicity": "Periodic"
+    },
+    "P6_LOCAL_INTERCONNECT": {
+      "class_id": "P6",
+      "base_pairs": 55,
+      "aug_pairs": 111,
+      "total_pairs": 166,
+      "total_images": 332,
+      "periodicity": "Non-Periodic"
+    },
+    "P7_METAL_ROUTING": {
+      "class_id": "P7",
+      "base_pairs": 55,
+      "aug_pairs": 111,
+      "total_pairs": 166,
+      "total_images": 332,
+      "periodicity": "Non-Periodic"
+    },
+    "P8_ACTIVE_CELL": {
+      "class_id": "P8",
+      "base_pairs": 55,
+      "aug_pairs": 111,
+      "total_pairs": 166,
+      "total_images": 332,
+      "periodicity": "Non-Periodic"
+    },
+    "P9_FINFET_FULL_CELL": {
+      "class_id": "P9",
+      "base_pairs": 57,
+      "aug_pairs": 113,
+      "total_pairs": 170,
+      "total_images": 340,
+      "periodicity": "Periodic"
+    }
+  }
+}
