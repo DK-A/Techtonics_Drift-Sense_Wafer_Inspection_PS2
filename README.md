@@ -485,3 +485,18 @@ python evaluate_rgb.py
 
 10. **Zuiderveld, K. (1994)**. *Contrast Limited Adaptive Histogram Equalization (CLAHE)*. Graphics Gems IV, Academic Press, 474–485. [https://doi.org/10.1016/B978-0-12-336156-1.50061-6](https://doi.org/10.1016/B978-0-12-336156-1.50061-6)  
     *(Local tile-based illumination contrast equalization for electron microscopy).*
+
+---
+
+## 11. Team Details
+
+* **Team Name**: **TECHTONICS**
+* **Institution / College**: **Chennai Institute of Technology**
+
+| Sr. No. | Role | Name | Academic Year | Email Address |
+| :---: | :--- | :--- | :---: | :--- |
+| 1 | **Team Leader** | **AKSHAYA SRELEKA P S** | III Year | `akshayasrelekaps.ece2024@citchennai.net` |
+| 2 | **Member 1** | **ASHWINKUMAR K** | III Year | — |
+| 3 | **Member 2** | **DHAMARAI KANNAN A** | III Year | — |
+| 4 | **Member 3** | **DHARSHAN S** | III Year | — |
+

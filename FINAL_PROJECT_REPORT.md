@@ -570,3 +570,18 @@ python evaluate_rgb.py
 ## 10. Conclusion
 
 The developed SEMICON localization pipeline demonstrates **state-of-the-art precision, sub-pixel robustness, cross-modal generalization, and real-time execution throughput**. By combining multi-scale Fourier correlation with directional geometry disambiguation, sub-pixel phase interpolation, and deep metric embeddings, the unified architecture achieves **$98.33\%$ accuracy** on grayscale SEM benchmarks and **$90.00\%$ accuracy** on RGB optical benchmarks with zero manual recalibration.
+
+---
+
+## 11. Team Details
+
+* **Team Name**: **TECHTONICS**
+* **Institution / College**: **Chennai Institute of Technology**
+
+| Sr. No. | Role | Name | Academic Year | Email Address |
+| :---: | :--- | :--- | :---: | :--- |
+| 1 | **Team Leader** | **AKSHAYA SRELEKA P S** | III Year | `akshayasrelekaps.ece2024@citchennai.net` |
+| 2 | **Member 1** | **ASHWINKUMAR K** | III Year | — |
+| 3 | **Member 2** | **DHAMARAI KANNAN A** | III Year | — |
+| 4 | **Member 3** | **DHARSHAN S** | III Year | — |
+
