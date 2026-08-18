@@ -309,6 +309,9 @@ submission/
 ├── generate_dataset.py          # Dataset generator & augmentation orchestrator (noise tiers, scale, rotation, drift)
 ├── localize.py                  # 5-Phase Cascade localization pipeline
 ├── evaluate_predictions.py      # Benchmark evaluation, plots & diagnostic generator
+├── train.py                     # Siamese deep metric network training & embedding learning
+├── configs/                     # Layout synthesis & simulation configurations
+│   └── dataset_config.json      # Physical constants & layer geometries
 ├── src/                         # Core layout rendering & SEM physics module
 │   └── utils.py                 # Low-level SEM degradation & augmentation primitives (Poisson shot noise, MTF blur, charging, edge halos)
 ├── model/                       # Pretrained deep learning model weights
@@ -316,7 +319,8 @@ submission/
 ├── submission_dataset/          # Pre-bundled 120-pair dataset (reference & search + manifest)
 │   ├── reference/               # High-mag reference images (1000x1000)
 │   ├── search/                  # Low-mag search images (1000x1000)
-│   └── manifest.csv             # Ground truth & physical metadata
+│   ├── manifest.csv             # Ground truth & physical metadata
+│   └── seeds.json               # Deterministic seed registries
 ├── results/                     # Benchmark results & diagnostic visual artifacts
 │   ├── predictions.csv          # Predicted coordinates, errors, & runtimes
 │   ├── overall_metrics.csv      # High-level benchmark metrics
