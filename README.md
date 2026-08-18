@@ -328,7 +328,9 @@ Open **`http://localhost:8000`** in your browser to:
 
 ```text
 submission/
-├── FINAL_PROJECT_REPORT.md      # Comprehensive 400+ line technical report
+├── TECHTONICS_PS02.pdf          # Official project presentation deck (PDF format)
+├── TECHTONICS_PS02.pptx         # Official project presentation deck (PowerPoint format)
+├── FINAL_PROJECT_REPORT.md      # Comprehensive 500+ line technical report
 ├── README.md                    # Visual technical documentation (this file)
 ├── requirements.txt             # Pinned pip dependencies
 ├── app.py                       # Interactive Web Metrology Server
