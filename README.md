@@ -261,10 +261,11 @@ Below is the detailed diagnostic audit of the **two failure cases**:
 > **Note on Dataset Generation**:  
 > Re-running `python generate_dataset.py` is **optional**. Because it performs full forward physical SEM simulation ($10\times$ fine-scale grid, Monte Carlo secondary electron yield, Poisson beam shot noise, MTF Gaussian scattering, and electrostatic charging streaks across 240 high-res images), regenerating all 120 pairs from scratch takes **~15 minutes** (~12–18 mins on standard CPU). You can **immediately jump to Step 2 (`python localize.py`)** to run inference.
 
-### 7.1 Environment Installation
+### 7.1 Clone Repository & Environment Setup
 ```bash
-# Clone repository and navigate to submission directory
-cd submission/
+# Clone the repository
+git clone https://github.com/DK-A/Techtonics_Drift-Sense_Wafer_Inspection_PS2.git
+cd Techtonics_Drift-Sense_Wafer_Inspection_PS2
 
 # Install exact pinned requirements
 pip install -r requirements.txt
