@@ -1,2 +1,2 @@
 total_samples,mean_error_px,median_error_px,p95_error_px,p99_error_px,max_error_px,std_error_px,accuracy_lt_5px,accuracy_lt_4px,accuracy_lt_2px,accuracy_lt_1px,subpixel_rate_lt_0_5px,mean_runtime_ms,median_runtime_ms,p95_runtime_ms
-120,1.529,0.7012,1.1829,18.0684,87.1114,8.0894,98.33,98.33,98.33,86.67,30.83,672.39,643.25,1003.26
+120,1.529,0.7012,1.1829,18.0684,87.1114,8.0894,98.33,98.33,98.33,86.67,30.83,545.0,495.3,737.17

@@ -9,3 +9,6 @@ __pycache__/
 .DS_Store
 Thumbs.db
 *.tmp
+*.mp4
+*.mov
+*.avi

@@ -1,0 +1,2 @@
+total_pairs,mean_error_px,median_error_px,p95_error_px,max_error_px,accuracy_lt_5px,accuracy_lt_2px,accuracy_lt_1px,subpixel_accuracy_lt_0_5px,mean_runtime_ms
+40,27.4603,0.8233,224.057,415.6538,90.0,90.0,72.5,25.0,827.14

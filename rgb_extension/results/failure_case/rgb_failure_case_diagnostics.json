@@ -1,0 +1,26 @@
+[
+  {
+    "case_number": 1,
+    "pair_id": "RGB_PAIR_011",
+    "pattern_name": "FIN_GATE",
+    "ground_truth": "(480.35, 512.85) px",
+    "prediction": "(228.75, 843.71) px",
+    "displacement": "dx = -251.60 px, dy = +330.85 px",
+    "total_error_px": 415.6538,
+    "distance_gt_to_center_px": 23.48,
+    "distance_pred_to_center_px": 437.85,
+    "overlay_image": "rgb_failure_case_1_overlay.png"
+  },
+  {
+    "case_number": 2,
+    "pair_id": "RGB_PAIR_040",
+    "pattern_name": "FINFET_FULL_CELL",
+    "ground_truth": "(261.23, 340.15) px",
+    "prediction": "(262.00, 423.00) px",
+    "displacement": "dx = +0.77 px, dy = +82.85 px",
+    "total_error_px": 82.8506,
+    "distance_gt_to_center_px": 287.33,
+    "distance_pred_to_center_px": 250.15,
+    "overlay_image": "rgb_failure_case_2_overlay.png"
+  }
+]
