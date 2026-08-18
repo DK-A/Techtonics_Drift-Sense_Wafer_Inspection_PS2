@@ -64,18 +64,33 @@ Discrete Arrival Count Gaussian Beam PSF               Dielectric Trapping    Th
 8. **Continuous Non-Junction Spatial Offsets**:
    *Physical Mechanism*: Targets are placed at arbitrary coordinates (line midpoints, trench spaces, boundary edges) across all 9 spatial quadrants with continuous non-pitch offsets ($\Delta \in [7.5, 23.5]\text{ px}$) to prevent spatial grid-junction bias.
 
+### Physical Degradation & Augmentation Mapping Table:
+
+| Physics-Based Augmentation / Degradation Parameter | Parametric Range / Sweep | Physical Fab Mechanism & Purpose |
+| :--- | :---: | :--- |
+| **Poisson Primary Electron Shot Noise** | `500 – 3500 e⁻/pixel` | Low-dose electron beam Poisson counting noise during high-speed review |
+| **Gaussian Secondary-Electron Detector Noise** | `σ = 0.8 – 3.2` | Everhart-Thornley scintillator & amplifier readout noise |
+| **MTF Gaussian Beam Blur / PSF** | `σ = 1.0 – 2.5 px` | Electron-beam spot waist scattering & column spherical aberrations |
+| **Electrostatic Surface Charging Streaks** | Scanline intensity modulation | Dielectric charge trapping & secondary electron deflection in $SiO_2$ |
+| **Cross-Magnification Scale Variations** | `0.091 – 0.111` ($\pm 10\%$) | Working distance ($Z$-height) drift & accelerating voltage fluctuations |
+| **Angular Rotation Misalignment** | `±2.0°` | Wafer chuck pre-alignment & mechanical clamping tolerances |
+| **Piezoelectric Stage Positioning Drift** | `±11.0 px` | Thermal expansion of stage assembly & piezo-actuator hysteresis |
+| **Continuous Non-Junction Spatial Placement** | Arbitrary quadrants & midpoints | Prevents spatial grid-junction bias; tests arbitrary navigation recovery |
+
 ---
 
 ## 3. Executive Benchmark Summary
 
 Across the independently generated, 100% held-out **120-pair benchmark dataset** spanning all **8 required industrial patterns (P1–P8)**, the frozen 5-Phase Cascade Pipeline delivers:
 
-* **Accuracy ($< 5.0\text{ px}$ Operational Threshold)**: **`98.33%`** (118 / 120 pairs)
-* **Fine Alignment Accuracy ($< 2.0\text{ px}$)**: **`98.33%`** (118 / 120 pairs)
+* **Operational Accuracy ($< 5.0\text{ px}$)**: **`98.33%`** (118 / 120 pairs)
+* **Standard Metrology Accuracy ($< 4.0\text{ px}$)**: **`98.33%`** (118 / 120 pairs)
+* **Fine Review Accuracy ($< 2.0\text{ px}$)**: **`98.33%`** (118 / 120 pairs)
 * **High Precision Accuracy ($< 1.0\text{ px}$)**: **`86.67%`** (104 / 120 pairs)
-* **Sub-Pixel Accuracy (< 0.5 px)**: **`30.83%`** (37 / 120 pairs)
-* **Overall Median Localization Error**: **`0.7012 px`**
-* **Overall Mean Localization Error**: **`1.5290 px`** (P95: `1.1829 px`)
+* **Sub-Half-Pixel Accuracy ($< 0.5\text{ px}$)**: **`30.83%`** (37 / 120 pairs)
+* **Median Localization Error**: **`0.7012 px`** (sub-pixel-scale median precision relative to 1-pixel limit)
+* **In-Pitch Trimmed Mean Error**: **`0.6190 px`** (P95: `1.1829 px`)
+* **Overall Arithmetic Mean Error**: **`1.5290 px`** (right-skewed by 2 discrete periodic jump outliers)
 * **Inference Throughput**: **`672.39 ms / image pair`** (Sub-second real-time CPU throughput)
 * **Category Reliability**: **6 out of 8 pattern categories achieved 100.0% Accuracy**.
 

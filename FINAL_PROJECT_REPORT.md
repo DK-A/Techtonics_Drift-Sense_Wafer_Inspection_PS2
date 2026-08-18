@@ -301,7 +301,7 @@ P95 Runtime per Pair          : 1003.26 ms
 
 ### 4.1 Per-Pattern Performance Breakdown (P1–P8)
 
-| Pattern Code | Pattern Name | Evaluated Pairs (N) | Mean Error | Median Error | P95 Error | Accuracy $<1.0\text{px}$ | Pass Rate ($<5.0\text{px}$) | Mean Latency |
+| Pattern Code | Pattern Name | Evaluated Pairs (N) | Mean Error | Median Error | P95 Error | Accuracy $<1.0\text{px}$ | Accuracy ($<5.0\text{px}$) | Mean Latency |
 | :---: | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | **P1** | `FIN_ARRAY` | 15 | **0.5118 px** | 0.587 px | 1.066 px | 86.7% | **100.0%** | 721.4 ms |
 | **P2** | `FIN_CUT` | 15 | **0.6824 px** | 0.638 px | 1.186 px | 73.3% | **100.0%** | 688.2 ms |
@@ -312,14 +312,14 @@ P95 Runtime per Pair          : 1003.26 ms
 | **P7** | `ACTIVE_CELL` | 15 | **0.6315 px** | 0.615 px | 1.172 px | 80.0% | **100.0%** | 718.3 ms |
 | **P8** | `FINFET_FULL_CELL` | 15 | **4.9982 px** | **0.706 px** | 20.389 px | 93.3% | **93.3%** | 825.9 ms |
 
-* **Key Takeaway**: **7 out of the 8 patterns achieved a flawless 100.0% pass rate** at $<2.0\text{ px}$ and $<5.0\text{ px}$. Median error across all classes remains bounded between $0.58\text{ px}$ and $0.78\text{ px}$.
+* **Key Takeaway**: **7 out of the 8 patterns achieved a flawless 100.0% accuracy** at $<2.0\text{ px}$ and $<5.0\text{ px}$. Median error across all classes remains bounded between $0.58\text{ px}$ and $0.78\text{ px}$.
 
 ---
 
 ### 4.2 Controlled Physical Noise Progression
 Evaluating the controlled pure-noise series where geometry is held nominal while SEM beam dose is progressively degraded shows **monotonic physical error scaling**:
 
-| SEM Noise Tier | Beam Dose ($\text{e}^-/\text{px}$) | Det. $\sigma$ | Mean Error | Median Error | P95 Error | Accuracy $<1.0\text{px}$ | Pass Rate ($<5.0\text{px}$) |
+| SEM Noise Tier | Beam Dose ($\text{e}^-/\text{px}$) | Det. $\sigma$ | Mean Error | Median Error | P95 Error | Accuracy $<1.0\text{px}$ | Accuracy ($<5.0\text{px}$) |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | **LOW (Nominal)** | 3500 | 0.8 | **0.5502 px** | 0.635 px | 1.037 px | **87.5%** | **100.0%** |
 | **MEDIUM (Standard)** | 2000 | 1.6 | **0.6920 px** | 0.692 px | 1.207 px | **83.3%** | **100.0%** |
