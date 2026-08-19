@@ -317,7 +317,7 @@ cd Techtonics_Drift-Sense_Wafer_Inspection_PS2
 pip install -r requirements.txt
 ```
 
-### 7.2 End-to-End Pipeline Execution (Zero CLI Interventions Required)
+### 7.2 End-to-End Batch Pipeline Execution (Zero CLI Interventions Required)
 
 ```bash
 # [OPTIONAL] Step 1: Re-generate the 120-pair dataset from scratch (Takes ~15 mins)
@@ -325,13 +325,54 @@ pip install -r requirements.txt
 python generate_dataset.py
 
 # Step 2: Run 5-Phase localization cascade across all 120 pairs (~1 min on CPU)
+# (Automatically logs Pred (x, y), Ground Truth (x, y), Err (px), Path, and Latency per pair)
 python localize.py
 
 # Step 3: Run comprehensive evaluation and generate all plots, collages & failure reports
 python evaluate_predictions.py
 ```
 
-### 7.3 Interactive Web Application & Live Metrology Suite
+### 7.3 Single-Pair Direct Inference Mode
+
+You can run direct single-pair inference by specifying exact image paths with `--reference` and `--search`. The engine automatically looks up the ground truth from `submission_dataset/manifest.csv` if available to report localization error:
+
+```bash
+# Basic single-pair execution
+python localize.py \
+  --reference submission_dataset/reference/ref_001.png \
+  --search submission_dataset/search/search_001.png
+```
+
+**Terminal Output**:
+```text
+==================================================
+SEM PATTERN LOCALIZATION RESULT
+==================================================
+Predicted Center: (508.054, 514.958) px
+Confidence:       0.9125
+Scale Used:       0.1000 (~10.0:1)
+Angle Used:       +0.25 deg
+Cascade Path:     ncc_direct
+Runtime:          577.0 ms
+Ground Truth:     (507.968, 515.000) px
+Localization Err: 0.0957 px (PASS <5px)
+==================================================
+x=508.0540 y=514.9580
+```
+
+```bash
+# Optional manual ground-truth evaluation:
+python localize.py \
+  --reference path/to/reference.png \
+  --search path/to/search.png \
+  --gt-x 507.97 \
+  --gt-y 515.00
+
+# Optional JSON output:
+python localize.py --reference path/to/ref.png --search path/to/search.png --json
+```
+
+### 7.4 Interactive Web Application & Live Metrology Suite
 
 Launch the standalone browser-based inspection application:
 ```bash

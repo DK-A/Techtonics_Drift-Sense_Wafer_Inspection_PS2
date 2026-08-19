@@ -797,7 +797,10 @@ def run_batch_manifest(manifest_csv: str, output_csv: str, weights_path: str = N
             "runtime_ms": res["runtime_ms"]
         }
         results.append(res_row)
-        print(f"  [{idx+1}/{len(rows)}] {pair_id} ({pattern_type}) -> Err: {err_px} px | Path: {res['path_used']} | Time: {res['runtime_ms']:.1f}ms")
+        if gt_x is not None and gt_y is not None:
+            print(f"  [{idx+1:03d}/{len(rows)}] {pair_id} ({pattern_type:<18}) -> Pred: ({res['pred_x']:6.2f}, {res['pred_y']:6.2f}) | GT: ({gt_x:6.2f}, {gt_y:6.2f}) | Err: {err_px:6.3f} px | {res['path_used']} ({res['runtime_ms']:5.1f}ms)")
+        else:
+            print(f"  [{idx+1:03d}/{len(rows)}] {pair_id} ({pattern_type:<18}) -> Pred: ({res['pred_x']:6.2f}, {res['pred_y']:6.2f}) | Path: {res['path_used']} ({res['runtime_ms']:5.1f}ms)")
 
     os.makedirs(os.path.dirname(os.path.abspath(output_csv)), exist_ok=True)
     fieldnames = list(results[0].keys()) if results else [
@@ -841,8 +844,29 @@ def main():
             pattern_type=args.pattern,
             weights_path=args.weights
         )
+        gt_x = args.gt_x
+        gt_y = args.gt_y
+        if (gt_x is None or gt_y is None) and os.path.exists("submission_dataset/manifest.csv"):
+            ref_base = os.path.basename(args.reference)
+            search_base = os.path.basename(args.search)
+            try:
+                with open("submission_dataset/manifest.csv", "r", encoding="utf-8") as mf:
+                    reader = csv.DictReader(mf)
+                    for row in reader:
+                        if os.path.basename(row.get("reference_path", "")) == ref_base or os.path.basename(row.get("search_path", "")) == search_base:
+                            gt_x = float(row["gt_x"])
+                            gt_y = float(row["gt_y"])
+                            break
+            except Exception:
+                pass
+
         if args.json:
-            print(json.dumps(res, indent=2))
+            out = dict(res)
+            if gt_x is not None and gt_y is not None:
+                out["gt_x"] = gt_x
+                out["gt_y"] = gt_y
+                out["error_px"] = float(np.hypot(res['pred_x'] - gt_x, res['pred_y'] - gt_y))
+            print(json.dumps(out, indent=2))
         else:
             print("==================================================")
             print("SEM PATTERN LOCALIZATION RESULT")
@@ -853,9 +877,9 @@ def main():
             print(f"Angle Used:       {res['angle_used']:+.2f} deg")
             print(f"Cascade Path:     {res['path_used']}")
             print(f"Runtime:          {res['runtime_ms']:.1f} ms")
-            if args.gt_x is not None and args.gt_y is not None:
-                err = float(np.hypot(res['pred_x'] - args.gt_x, res['pred_y'] - args.gt_y))
-                print(f"Ground Truth:     ({args.gt_x:.3f}, {args.gt_y:.3f}) px")
+            if gt_x is not None and gt_y is not None:
+                err = float(np.hypot(res['pred_x'] - gt_x, res['pred_y'] - gt_y))
+                print(f"Ground Truth:     ({gt_x:.3f}, {gt_y:.3f}) px")
                 print(f"Localization Err: {err:.4f} px ({'PASS <5px' if err < 5.0 else 'FAIL'})")
             print("==================================================")
             print(f"x={res['pred_x']:.4f} y={res['pred_y']:.4f}")
