@@ -821,11 +821,13 @@ def main():
     parser = argparse.ArgumentParser(description="Cross-Magnification SEM Pattern Localization")
     parser.add_argument("--reference", type=str, help="Path to 1000x1000 reference image")
     parser.add_argument("--search", type=str, help="Path to 1000x1000 search image")
+    parser.add_argument("--pattern", type=str, default="GENERIC", help="Pattern type name (optional)")
+    parser.add_argument("--gt-x", "--gt_x", type=float, default=None, help="Optional ground truth X coordinate for error calculation")
+    parser.add_argument("--gt-y", "--gt_y", type=float, default=None, help="Optional ground truth Y coordinate for error calculation")
     parser.add_argument("--manifest", type=str, help="Path to manifest CSV for batch processing")
     parser.add_argument("--out_csv", type=str, default="results/predictions.csv", help="Output predictions CSV path")
     parser.add_argument("--weights", type=str, default=None, help="Path to optional ML weights")
-    parser.add_argument("--tau_gap", type=float, default=0.08, help="Phase 1 gap confidence threshold")
-    parser.add_argument("--tau_sharpness", type=float, default=1.15, help="Phase 1 sharpness confidence threshold")
+    parser.add_argument("--tau_conf", type=float, default=0.65, help="Phase 1 confidence threshold")
     parser.add_argument("--json", action="store_true", help="Print output as JSON")
     args = parser.parse_args()
 
@@ -835,8 +837,8 @@ def main():
         res = localize_pair(
             args.reference,
             args.search,
-            tau_gap=args.tau_gap,
-            tau_sharpness=args.tau_sharpness,
+            tau_conf=args.tau_conf,
+            pattern_type=args.pattern,
             weights_path=args.weights
         )
         if args.json:
@@ -848,10 +850,15 @@ def main():
             print(f"Predicted Center: ({res['pred_x']:.3f}, {res['pred_y']:.3f}) px")
             print(f"Confidence:       {res['confidence']:.4f}")
             print(f"Scale Used:       {res['scale_used']:.4f} (~{1.0/res['scale_used']:.1f}:1)")
-            print(f"Angle Used:       {res['angle_used']:+.2f}°")
+            print(f"Angle Used:       {res['angle_used']:+.2f} deg")
             print(f"Cascade Path:     {res['path_used']}")
             print(f"Runtime:          {res['runtime_ms']:.1f} ms")
+            if args.gt_x is not None and args.gt_y is not None:
+                err = float(np.hypot(res['pred_x'] - args.gt_x, res['pred_y'] - args.gt_y))
+                print(f"Ground Truth:     ({args.gt_x:.3f}, {args.gt_y:.3f}) px")
+                print(f"Localization Err: {err:.4f} px ({'PASS <5px' if err < 5.0 else 'FAIL'})")
             print("==================================================")
+            print(f"x={res['pred_x']:.4f} y={res['pred_y']:.4f}")
     elif os.path.exists("submission_dataset/manifest.csv"):
         print("No arguments provided — running batch inference on submission_dataset/manifest.csv...")
         run_batch_manifest("submission_dataset/manifest.csv", args.out_csv, weights_path=args.weights)
