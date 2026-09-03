@@ -33,16 +33,29 @@ def resolve_path(p: str, base_dir: str = ".") -> str:
 
 def main():
     parser = argparse.ArgumentParser(description="Drift-Sense Phase 2 Unknown Pose Registration Engine")
-    parser.add_argument("--input", type=str, required=True, help="Path to input pairs.csv manifest")
-    parser.add_argument("--output", type=str, required=True, help="Path to output predictions.csv destination")
-    parser.add_argument("--weights", type=str, default="model/phase5_reranker.pt", help="Path to PyTorch model weights")
+    parser.add_argument("-i", "--input", "--input-csv", "--pairs", type=str, default=None, help="Path to input pairs.csv manifest")
+    parser.add_argument("-o", "--output", "--output-csv", "--out", type=str, default=None, help="Path to output predictions.csv destination")
+    parser.add_argument("-w", "--weights", type=str, default="model/phase5_reranker.pt", help="Path to PyTorch model weights")
     parser.add_argument("--fast", action="store_true", help="Enable 2.4x ultra-high speed pyramidal mode (0.88s/pair)")
+    parser.add_argument("pos_args", nargs="*", help="Positional fallback: python register.py pairs.csv predictions.csv")
     args = parser.parse_args()
 
     input_csv = args.input
     output_csv = args.output
-    weights_path = args.weights
-    fast_mode = args.fast
+
+    # Handle positional invocation: python register.py pairs.csv predictions.csv
+    if not input_csv and len(args.pos_args) >= 1:
+        input_csv = args.pos_args[0]
+    if not output_csv and len(args.pos_args) >= 2:
+        output_csv = args.pos_args[1]
+
+    # Explicit Fallback Notifications
+    if not args.input and not (args.pos_args and len(args.pos_args) >= 1):
+        print(f"\n[CLI NOTICE: Fallback Activated] No '--input' argument specified. Defaulting to '{input_csv}'.")
+        print("                                 To specify input/output files, use:")
+        print("                                 python register.py --input <pairs.csv> --output <predictions.csv>\n")
+    if not args.output and not (args.pos_args and len(args.pos_args) >= 2):
+        print(f"[CLI NOTICE: Fallback Activated] No '--output' argument specified. Defaulting to '{output_csv}'.\n")
 
     if not os.path.exists(input_csv):
         raise FileNotFoundError(f"Input manifest not found: {input_csv}")
@@ -59,8 +72,11 @@ def main():
             embedder_model = LightweightSEMEmbedder()
             embedder_model.load_state_dict(torch.load(weights_path, map_location="cpu"))
             embedder_model.eval()
+            print(f"[ENGINE STATUS] Loaded Phase 5 Siamese Verifier ({weights_path}, CPU).")
         except Exception as e:
-            print(f"[Warning] Failed to load model weights from {weights_path}: {e}")
+            print(f"[ENGINE WARNING] Could not load model weights ({e}). Activating Pure Classical Fallback.")
+    else:
+        print("[ENGINE STATUS: Defensive Fallback Active] Model weights not found. Running Classical 4-Phase Pure CPU Cascade.")
 
     base_dir = os.path.dirname(os.path.abspath(input_csv))
 

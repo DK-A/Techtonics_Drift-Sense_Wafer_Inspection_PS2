@@ -167,35 +167,71 @@ def score_predictions(predictions_csv, ground_truth_csv):
 
 def main():
     parser = argparse.ArgumentParser(description="Score predictions against ground truth manifest")
-    parser.add_argument("--pred", type=str, default="predictions.csv", help="Path to predictions.csv")
-    parser.add_argument("--gt", type=str, default="phase2_dataset_reference/ground_truth.csv", help="Path to ground_truth.csv")
+    parser.add_argument("-p", "--pred", "--predictions", "--pred-csv", "--predictions-csv", type=str, default="predictions.csv", help="Path to predictions.csv")
+    parser.add_argument("-g", "-m", "--gt", "--metadata", "--ground_truth", "--ground-truth", type=str, default=None, help="Path to ground_truth.csv")
+    parser.add_argument("-d", "--dir", "--dataset-dir", type=str, default=None, help="Path to dataset directory containing ground_truth.csv")
     args, unknown = parser.parse_known_args()
+
+    # Alert evaluator if unknown arguments were passed
+    if unknown:
+        print("\n" + "!" * 115)
+        print(f" [CLI WARNING: Unrecognized Flag(s) Detected] {unknown}")
+        print("  Drift-Sense score.py supports:")
+        print("    --predictions <path_to_predictions.csv>  (or -p, --pred)")
+        print("    --metadata <path_to_ground_truth.csv>    (or -m, -g, --gt)")
+        print("    --dir <path_to_dataset_folder>           (or -d, --dataset-dir)")
+        print("!" * 115 + "\n")
 
     # Handle positional arguments fallback
     pred_csv = args.pred
     gt_csv = args.gt
 
-    if len(sys.argv) >= 3 and not sys.argv[1].startswith("--"):
+    if args.dir:
+        dir_gt = os.path.join(args.dir, "ground_truth.csv")
+        if os.path.exists(dir_gt):
+            gt_csv = dir_gt
+        else:
+            dir_meta = os.path.join(args.dir, "metadata.csv")
+            if os.path.exists(dir_meta):
+                gt_csv = dir_meta
+
+    if len(sys.argv) >= 3 and not sys.argv[1].startswith("-"):
         pred_csv = sys.argv[1]
         gt_csv = sys.argv[2]
 
+    # Explicit Fallback Notifications
     if not os.path.exists(pred_csv):
-        # Fallback search
+        orig_pred = pred_csv
+        found = False
         for candidate in ["predictions.csv", "predictions_official.csv"]:
             if os.path.exists(candidate):
                 pred_csv = candidate
+                found = True
+                print(f"[CLI NOTICE: Fallback Activated] Predictions file '{orig_pred}' was not found.")
+                print(f"                                   Auto-resolved to local fallback: '{pred_csv}'.\n")
                 break
+        if not found:
+            raise FileNotFoundError(f"Predictions file not found: '{orig_pred}' (and no local fallback exists)")
 
-    if not os.path.exists(gt_csv):
+    if not gt_csv or not os.path.exists(gt_csv):
+        orig_gt = gt_csv
+        found = False
         for candidate in [
-            "phase2_dataset_reference/ground_truth.csv",
-            "phase2_dataset_reference/metadata.csv",
-            "phase2_dataset_stress/ground_truth.csv",
-            "phase2_dataset_stress/metadata.csv"
+            "submission_dataset/phase2_reference_220pairs/ground_truth.csv",
+            "submission_dataset/phase2_reference_220pairs/metadata.csv",
+            "submission_dataset/phase2_stress_220pairs/ground_truth.csv",
+            "submission_dataset/phase2_stress_220pairs/metadata.csv",
+            "submission_dataset/phase2_reference_20pairs/ground_truth.csv",
+            "submission_dataset/phase2_stress_20pairs/ground_truth.csv"
         ]:
             if os.path.exists(candidate):
                 gt_csv = candidate
+                found = True
+                print(f"[CLI NOTICE: Fallback Activated] Ground truth file '{orig_gt}' was not specified or not found.")
+                print(f"                                   Auto-resolved to benchmark ground truth: '{gt_csv}'.\n")
                 break
+        if not found:
+            raise FileNotFoundError(f"Ground truth file not found: '{orig_gt}'")
 
     score_predictions(pred_csv, gt_csv)
 

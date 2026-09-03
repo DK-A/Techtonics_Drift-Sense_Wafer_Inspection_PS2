@@ -21,6 +21,8 @@ import webbrowser
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 import numpy as np
 
+import argparse
+
 # ─── Configuration ─────────────────────────────────────────────────────────
 PORT = 8000
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -31,6 +33,22 @@ PREDICTIONS_CSV = os.path.join(BASE_DIR, "predictions", "predictions_reference_2
 if not os.path.exists(PREDICTIONS_CSV):
     PREDICTIONS_CSV = os.path.join(BASE_DIR, "predictions.csv")
 
+def configure_app(dataset_path=None, predictions_path=None, port=8000, is_stress=False):
+    global DATASET_DIR, PREDICTIONS_CSV, PORT, METADATA, GROUND_TRUTH, PREDICTIONS
+    PORT = port
+    if is_stress:
+        DATASET_DIR = os.path.join(BASE_DIR, "submission_dataset", "phase2_stress_220pairs")
+        PREDICTIONS_CSV = os.path.join(BASE_DIR, "predictions", "predictions_stress_220pairs.csv")
+        if not os.path.exists(PREDICTIONS_CSV):
+            PREDICTIONS_CSV = os.path.join(BASE_DIR, "predictions_stress.csv")
+    if dataset_path:
+        DATASET_DIR = os.path.abspath(dataset_path)
+    if predictions_path:
+        PREDICTIONS_CSV = os.path.abspath(predictions_path)
+
+    METADATA = load_metadata()
+    GROUND_TRUTH = load_ground_truth()
+    PREDICTIONS = load_predictions()
 
 def load_metadata():
     """Load metadata.csv from dataset directory."""
@@ -279,6 +297,15 @@ class MetrologyHandler(SimpleHTTPRequestHandler):
 
 
 def main():
+    parser = argparse.ArgumentParser(description="Drift-Sense Web Metrology Dashboard")
+    parser.add_argument("--dataset", type=str, default=None, help="Path to dataset folder (e.g. submission_dataset/phase2_stress_220pairs)")
+    parser.add_argument("--predictions", type=str, default=None, help="Path to predictions.csv file")
+    parser.add_argument("--stress", action="store_true", help="Quick flag to load the Heavy Stress 220-Pair suite")
+    parser.add_argument("--port", type=int, default=8000, help="Port to run server on")
+    args = parser.parse_args()
+
+    configure_app(dataset_path=args.dataset, predictions_path=args.predictions, port=args.port, is_stress=args.stress)
+
     server = ThreadingHTTPServer(("0.0.0.0", PORT), MetrologyHandler)
     server.daemon_threads = True
     url = f"http://localhost:{PORT}"
