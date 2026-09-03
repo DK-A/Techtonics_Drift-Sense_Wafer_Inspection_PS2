@@ -303,11 +303,25 @@ Below is the granular metrology performance audited across all **4 individual da
 
 ---
 
-### 6.3 Key Diagnostic Plots (PR Curve, Error CDF, Per-Pattern, Noise Progression)
+### 6.3 📊 Graphical Submission Artifacts
 
-![Key Diagnostic Plots Grid](docs/assets/key_diagnostic_plots.png)
+#### 1. Classification Confusion Matrix & Localization Error CDF
+| Target Detection Confusion Matrix | Localization Error Cumulative Distribution Function (CDF) |
+| :---: | :---: |
+| ![Confusion Matrix](docs/assets/confusion_matrix.png) | ![Localization Error CDF](docs/assets/key_diagnostic_plots.png) |
+| **2x2 Benchmark Classification Matrix**<br>$\text{TP}=160, \text{FN}=0, \text{FP}=12, \text{TN}=48$ (100% Sensitivity, 80% Specificity, $\text{F1} = 0.9639$) | **Localization Error CDF**<br>86.2% Sub-1.0px Full Credit Tier, 86.9% Sub-2.0px ($0.2265\text{ px}$ Median Error) |
 
-*Figure 6.1: 4-Panel Key Diagnostic Plots displaying Precision-Recall Curves, Localization Error CDF, Per-Pattern Error Comparisons across all 9 Semiconductor Architectures, and Controlled SEM Noise Progression.*
+#### 2. Multi-Pattern Architecture Grid & Optical Microscopy Analogue
+| 3x3 Multi-Pattern Inspection Grid | Multi-Spectral RGB Optical Microscope Suite |
+| :---: | :---: |
+| ![Stress Suite Grid](docs/assets/stress_suite_collage.png) | ![Optical RGB Suite](docs/assets/optical_rgb_collage.png) |
+| **All 9 Semiconductor Pattern Families**<br>DRAM, FinFET, Contacts, HKMG Gates, Cuts, Interconnects, Active Cells | **Cross-Modal Optical Microscopy Analogue**<br>Set D: 100.0% Detection, 95.0% Sub-1.0px, $0.3866\text{ px}$ Median Error |
+
+#### 3. Key Diagnostics & Physics-Grounded Metrology Failure Modes
+| Multi-Panel Diagnostic Plots (PR Curve, Error CDF) | Comprehensive Metrology Failure Diagnostics |
+| :---: | :---: |
+| ![Key Diagnostic Plots](docs/assets/key_diagnostic_plots.png) | ![Master Failure Grid](docs/assets/master_failure_grid.png) |
+| **Precision-Recall & Error Progression**<br>Sub-pixel localization across Poisson shot noise and continuous pose drift | **Physics-Grounded Failure Analysis**<br>Periodic pitch ambiguity, charging streaks, boundary conditions |
 
 ---
 

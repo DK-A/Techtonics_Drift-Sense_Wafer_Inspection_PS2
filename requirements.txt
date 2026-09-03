@@ -18,7 +18,6 @@ Pillow>=9.5.0
 
 # ── Deep Learning Inference & Verification (Single-Core CPU Only) ──
 torch>=2.0.0
-torchvision>=0.15.0
 
 # ── Diagnostics, Metrology Plotting & Reporting ──
 matplotlib>=3.7.0
