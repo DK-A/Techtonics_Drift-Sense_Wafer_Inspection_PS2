@@ -1,0 +1,7 @@
+pair_id,ref_path,search_path,pattern_type
+PH2_P0_003,submission_dataset/phase2_stress_20pairs/set_b/reference/ref_003.png,submission_dataset/phase2_stress_20pairs/set_b/search/search_003.png,DRAM_CELL
+PH2_P4_001,submission_dataset/phase2_stress_20pairs/set_b/reference/ref_008.png,submission_dataset/phase2_stress_20pairs/set_b/search/search_008.png,CONTACT_ARRAY
+PH2_P5_001,submission_dataset/phase2_stress_20pairs/set_b/reference/ref_009.png,submission_dataset/phase2_stress_20pairs/set_b/search/search_009.png,LOCAL_INTERCONNECT
+PH2_P7_002,submission_dataset/phase2_stress_20pairs/set_b/reference/ref_013.png,submission_dataset/phase2_stress_20pairs/set_b/search/search_013.png,ACTIVE_CELL
+PH2_P8_004,submission_dataset/phase2_stress_20pairs/set_b/reference/ref_017.png,submission_dataset/phase2_stress_20pairs/set_b/search/search_017.png,FINFET_FULL_CELL
+PH2_P8_005,submission_dataset/phase2_stress_20pairs/set_b/reference/ref_018.png,submission_dataset/phase2_stress_20pairs/set_b/search/search_018.png,FINFET_FULL_CELL

@@ -1,0 +1,5 @@
+pair_id,set_category,pattern_code,pattern_name,reference_path,search_path,gt_found,gt_x,gt_y,gt_norm_x,gt_norm_y,scale_factor,rotation_deg,noise_dose,render_time_s
+PH2_P0_004,SET_C,P0,DRAM_CELL,submission_dataset/phase2_stress_20pairs/set_c/reference/ref_004.png,submission_dataset/phase2_stress_20pairs/set_c/search/search_004.png,0,0.0,0.0,0.0,0.0,0.0916,3.18,2147,35.3881
+PH2_P6_002,SET_C,P6,METAL_ROUTING,submission_dataset/phase2_stress_20pairs/set_c/reference/ref_011.png,submission_dataset/phase2_stress_20pairs/set_c/search/search_011.png,0,0.0,0.0,0.0,0.0,0.1092,4.57,1765,23.3787
+PH2_P8_006,SET_C,P8,FINFET_FULL_CELL,submission_dataset/phase2_stress_20pairs/set_c/reference/ref_019.png,submission_dataset/phase2_stress_20pairs/set_c/search/search_019.png,0,0.0,0.0,0.0,0.0,0.1173,4.48,2342,15.0136
+PH2_P8_007,SET_C,P8,FINFET_FULL_CELL,submission_dataset/phase2_stress_20pairs/set_c/reference/ref_020.png,submission_dataset/phase2_stress_20pairs/set_c/search/search_020.png,0,0.0,0.0,0.0,0.0,0.1245,-3.79,2421,14.4884

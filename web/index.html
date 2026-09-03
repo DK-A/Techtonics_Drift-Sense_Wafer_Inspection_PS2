@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DRIFT-SENSE Phase 2 — Wafer Metrology Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=3">
+</head>
+<body>
+
+<!-- ════════ TOP BAR ════════ -->
+<header>
+    <div class="brand">
+        <span class="brand-icon">🔬</span>
+        <div>
+            <div class="brand-title">DRIFT-SENSE PHASE 2</div>
+            <div class="brand-sub">Team Techtonics · Chennai Institute of Technology</div>
+        </div>
+    </div>
+
+    <div class="kpis">
+        <div class="kpi"><span class="kpi-label">PAIRS</span><span class="kpi-val" id="kpi-total">220</span></div>
+        <div class="kpi"><span class="kpi-label">SUB-1PX</span><span class="kpi-val green" id="kpi-subpixel">—</span></div>
+        <div class="kpi"><span class="kpi-label">REJ F1</span><span class="kpi-val" id="kpi-f1">—</span></div>
+        <div class="kpi"><span class="kpi-label">MED ERR</span><span class="kpi-val" id="kpi-median">—</span></div>
+        <div class="kpi"><span class="kpi-label">RECALL</span><span class="kpi-val green" id="kpi-recall">—</span></div>
+        <div class="kpi"><span class="kpi-label">LATENCY</span><span class="kpi-val" id="kpi-latency">—</span></div>
+    </div>
+
+    <nav class="tabs">
+        <button class="nav-tab active" id="btn-inspect" onclick="switchTab('inspect')">🔍 Pair Inspector</button>
+        <button class="nav-tab" id="btn-plots" onclick="switchTab('plots')">📊 Plots & Matrix</button>
+        <button class="nav-tab" id="btn-patterns" onclick="switchTab('patterns')">🧩 9-Pattern Grid</button>
+        <button class="nav-tab" id="btn-failures" onclick="switchTab('failures')">⚠ Failure Analysis</button>
+    </nav>
+</header>
+
+<!-- ════════ MAIN ════════ -->
+<main>
+
+    <!-- TAB 1: PAIR INSPECTOR -->
+    <section id="tab-inspect" class="tab-pane active">
+        <div class="inspect-layout">
+
+            <!-- Left: pair list -->
+            <div class="panel sidebar">
+                <div class="panel-head">
+                    <div class="panel-title">DATASET PAIRS</div>
+                    <select id="filter-set" class="sel" onchange="filterPairs()">
+                        <option value="ALL">All Sets</option>
+                        <option value="SET_A">Set A · Clean SEM</option>
+                        <option value="SET_B">Set B · Stress Noise</option>
+                        <option value="SET_C">Set C · Decoy (Absent)</option>
+                        <option value="SET_D">Set D · Optical RGB</option>
+                    </select>
+                </div>
+                <div class="pair-list" id="pair-list"></div>
+            </div>
+
+            <!-- Center: dual images -->
+            <div class="panel center">
+                <div class="center-toolbar">
+                    <div class="sel-info">
+                        <span class="sel-id" id="sel-pair-id">p001</span>
+                        <span class="badge set-a" id="sel-set">SET A</span>
+                        <span class="sel-arch" id="sel-arch">dram_1x</span>
+                    </div>
+                    <button class="btn-live" id="btn-live" onclick="runLive()">⚡ Run Live Registration</button>
+                </div>
+                <div class="img-grid">
+                    <div class="img-card">
+                        <div class="img-label">Reference Template (1000×1000)</div>
+                        <div class="img-wrap" id="ref-wrap">
+                            <canvas id="canvas-ref" width="1000" height="1000"></canvas>
+                        </div>
+                    </div>
+                    <div class="img-card">
+                        <div class="img-label">Search Wafer Image (1000×1000)
+                            <span class="legend"><span class="leg-gt">■</span> GT (Green) &nbsp;&nbsp;<span class="leg-pred">■</span> Pred (Red)</span>
+                        </div>
+                        <div class="img-wrap" id="srch-wrap">
+                            <canvas id="canvas-srch" width="1000" height="1000"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: metrics & live registration -->
+            <div class="panel right">
+                <!-- CARD 1: SUB-PIXEL CLOSE-UP (4×) -->
+                <div class="mcard closeup-mcard">
+                    <div class="mcard-head">
+                        <span class="mcard-title">SUB-PIXEL CLOSE-UP (4×)</span>
+                        <span class="live-pill ready" id="closeup-pill">STANDBY</span>
+                    </div>
+                    <div class="closeup-wrap">
+                        <canvas id="canvas-closeup" width="300" height="180"></canvas>
+                    </div>
+                    <div class="mrow" style="margin-top:6px;">
+                        <span class="mlabel">Sub-Pixel Shift (ΔX, ΔY)</span>
+                        <span class="mval highlight" id="m-delta">—</span>
+                    </div>
+                </div>
+
+                <!-- CARD 2: PAIR METROLOGY READOUT -->
+                <div class="mcard">
+                    <div class="mcard-title">PAIR METROLOGY READOUT</div>
+                    <div class="mrow"><span class="mlabel">Ground Truth (X, Y)</span><span class="mval" id="m-gt">—</span></div>
+                    <div class="mrow"><span class="mlabel">Predicted (X, Y)</span><span class="mval" id="m-pred">—</span></div>
+                    <div class="mrow"><span class="mlabel">Localization Error</span><span class="mval pass" id="m-error">—</span></div>
+                    <div class="mrow"><span class="mlabel">Rotation θ</span><span class="mval" id="m-theta">—</span></div>
+                    <div class="mrow"><span class="mlabel">Scale z</span><span class="mval" id="m-scale">—</span></div>
+                    <div class="mrow"><span class="mlabel">Platt Score</span><span class="mval" id="m-score">—</span></div>
+                    <div class="mrow verdict-row"><span class="mlabel">Verdict</span><span class="mval pass" id="m-verdict">—</span></div>
+                </div>
+
+                <!-- CARD 2: LIVE REGISTRATION EXECUTION MONITOR (No popups) -->
+                <div class="mcard live-mcard">
+                    <div class="mcard-head">
+                        <span class="mcard-title">LIVE INFERENCE MONITOR</span>
+                        <span class="live-pill ready" id="live-pill">READY</span>
+                    </div>
+                    <div class="mrow"><span class="mlabel">Target Pair</span><span class="mval" id="live-pair">—</span></div>
+                    <div class="mrow"><span class="mlabel">Inference Status</span><span class="mval" id="live-status">Ready</span></div>
+                    <div class="mrow"><span class="mlabel">Inference Latency</span><span class="mval highlight green" id="live-latency">—</span></div>
+                    <div class="mrow"><span class="mlabel">Algorithmic Path</span><span class="mval" id="live-path">—</span></div>
+                    <div class="mrow"><span class="mlabel">Live Registered (X, Y)</span><span class="mval highlight" id="live-pos">—</span></div>
+                    <div class="mrow"><span class="mlabel">Live Scale / Angle</span><span class="mval" id="live-scale-angle">—</span></div>
+                    <div class="mrow"><span class="mlabel">Confidence / Platt</span><span class="mval" id="live-score">—</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TAB 2: PLOTS & CONFUSION MATRIX -->
+    <section id="tab-plots" class="tab-pane">
+        <div class="plots-grid">
+            <div class="plot-card">
+                <div class="plot-title">Key Diagnostic Plots (PR, CDF, Per-Pattern, Noise)</div>
+                <img src="/docs/assets/key_diagnostic_plots.png" alt="Diagnostic Plots">
+            </div>
+            <div class="plot-card">
+                <div class="plot-title">220-Pair Confusion Matrix</div>
+                <img src="/docs/assets/confusion_matrix.png" alt="Confusion Matrix">
+            </div>
+        </div>
+    </section>
+
+    <!-- TAB 3: 9-PATTERN GRID -->
+    <section id="tab-patterns" class="tab-pane">
+        <div class="fullcard">
+            <h2 class="fc-title">3×3 Multi-Pattern Inspection Grid (All 9 Semiconductor Families)</h2>
+            <img src="/docs/assets/stress_suite_collage.png" alt="9-Pattern Grid" class="fullimg">
+        </div>
+    </section>
+
+    <!-- TAB 4: FAILURE ANALYSIS -->
+    <section id="tab-failures" class="tab-pane">
+        <div class="fullcard">
+            <h2 class="fc-title">Master Failure Analysis Grid (8 Audited Diagnostic Scenarios)</h2>
+            <p class="fc-sub">Each failure case is audited with root-cause analysis: periodic pitch traps, shot noise degradation, extreme rotation, charging artifacts, borderless saliency collapse, optical chromatic aberration, and decoy false alarm scenarios.</p>
+            <img src="/results/failure_case/master_failure_grid.png" alt="Failure Grid" class="fullimg">
+        </div>
+    </section>
+
+</main>
+
+<script>
+// DRIFT-SENSE PHASE 2 — Industrial Wafer Metrology Dashboard
+// Team Techtonics · Chennai Institute of Technology
+// Direct HTML5 Canvas Rendering — Zero Popups — Cache-Busted
+
+let META = [];
+let PREDS = {};
+let METRICS = {};
+let activeIdx = 0;
+
+let currentRefImg = null;
+let currentSrchImg = null;
+
+document.addEventListener("DOMContentLoaded", () => {
+    fetch("/api/data?t=" + Date.now())
+        .then(r => r.json())
+        .then(d => {
+            if (d.status !== "success") return;
+            META = d.metadata || [];
+            PREDS = d.predictions || {};
+            METRICS = d.metrics || {};
+            updateKPIs();
+            renderPairList();
+            if (META.length > 0) selectPair(0);
+            const params = new URLSearchParams(window.location.search);
+            if (params.get("autorun") === "1") {
+                setTimeout(() => { runLive(); }, 600);
+            }
+        })
+        .catch(e => console.error("Failed to load metrology data:", e));
+});
+
+function updateKPIs() {
+    setText("kpi-total", (METRICS.total_pairs || 220) + " Pairs");
+    setText("kpi-subpixel", METRICS.sub1_pct || "--");
+    setText("kpi-f1", METRICS.rejection_f1 || "--");
+    setText("kpi-median", METRICS.median_err || "--");
+    setText("kpi-recall", METRICS.recall || "--");
+    setText("kpi-latency", METRICS.cpu_latency || "--");
+}
+
+function setText(id, text) {
+    const el = document.getElementById(id);
+    if (el) el.innerText = text;
+}
+
+function renderPairList() {
+    const container = document.getElementById("pair-list");
+    if (!container) return;
+    container.innerHTML = "";
+
+    const filter = document.getElementById("filter-set").value;
+
+    META.forEach((p, idx) => {
+        const cat = p.set_category || "SET_A";
+        if (filter !== "ALL" && cat !== filter) return;
+
+        const row = document.createElement("div");
+        row.className = "pair-row" + (idx === activeIdx ? " active" : "");
+        row.onclick = () => selectPair(idx);
+
+        const catClass = cat.toLowerCase().replace("_", "-");
+        row.innerHTML = `
+            <span class="pid">${p.pair_id}</span>
+            <span class="parch">${p.architecture || "—"}</span>
+            <span class="badge ${catClass}">${cat.replace("_"," ")}</span>
+        `;
+        container.appendChild(row);
+    });
+}
+
+// ── Selecting a pair: Loads clean raw images WITHOUT bounding boxes ──
+function selectPair(idx) {
+    activeIdx = idx;
+    renderPairList();
+
+    const p = META[idx];
+    if (!p) return;
+
+    // Header info
+    setText("sel-pair-id", p.pair_id);
+    setText("sel-arch", p.architecture || "—");
+
+    const setBadge = document.getElementById("sel-set");
+    const cat = p.set_category || "SET_A";
+    setBadge.innerText = cat.replace("_", " ");
+    setBadge.className = "badge " + cat.toLowerCase().replace("_", "-");
+
+    // Reset sidebar cards to standby state until "Run Live Registration" is clicked
+    setText("m-gt", p.gt_present === "0" ? "ABSENT (Decoy)" : `(${parseFloat(p.gt_x||0).toFixed(1)}, ${parseFloat(p.gt_y||0).toFixed(1)})`);
+    setText("m-pred", "— (Click Run Live Registration)");
+    const errEl = document.getElementById("m-error");
+    if (errEl) { errEl.innerText = "—"; errEl.className = "mval"; }
+    setText("m-theta", "—");
+    setText("m-scale", "—");
+    setText("m-score", "—");
+    const verdictEl = document.getElementById("m-verdict");
+    if (verdictEl) { verdictEl.innerText = "⚡ Awaiting Live Registration"; verdictEl.className = "mval"; }
+
+    // Reset Live Inference Monitor
+    setText("live-pair", `${p.pair_id} · ${p.architecture || "dram"}`);
+    setText("live-status", "Ready — Click 'Run Live Registration'");
+    setText("live-latency", "—");
+    setText("live-path", "—");
+    setText("live-pos", "—");
+    setText("live-scale-angle", "—");
+    setText("live-score", "—");
+    setText("m-delta", "—");
+
+    const pill = document.getElementById("live-pill");
+    if (pill) { pill.className = "live-pill ready"; pill.innerText = "READY"; }
+
+    const closePill = document.getElementById("closeup-pill");
+    if (closePill) { closePill.className = "live-pill ready"; closePill.innerText = "STANDBY"; }
+
+    // Draw close-up standby loupe grid
+    drawCloseupPlaceholder();
+
+    // Load and draw CLEAN raw images without any bounding boxes
+    loadRawImages(p);
+}
+
+function drawCloseupPlaceholder() {
+    const canvasClose = document.getElementById("canvas-closeup");
+    if (!canvasClose) return;
+    const ctx = canvasClose.getContext("2d");
+    ctx.clearRect(0, 0, 300, 180);
+    ctx.fillStyle = "#0B0F1A";
+    ctx.fillRect(0, 0, 300, 180);
+
+    // Subtle grid lines
+    ctx.strokeStyle = "rgba(42, 51, 80, 0.4)";
+    ctx.lineWidth = 1;
+    for (let x = 30; x < 300; x += 30) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 180); ctx.stroke();
+    }
+    for (let y = 30; y < 180; y += 30) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(300, y); ctx.stroke();
+    }
+
+    // Center crosshair
+    ctx.strokeStyle = "rgba(56, 189, 248, 0.35)";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(150, 40); ctx.lineTo(150, 140);
+    ctx.moveTo(100, 90); ctx.lineTo(200, 90);
+    ctx.stroke();
+
+    ctx.fillStyle = "#38BDF8";
+    ctx.font = "bold 13px 'JetBrains Mono', monospace";
+    ctx.textAlign = "center";
+    ctx.fillText("4× SUB-PIXEL LOUPE", 150, 75);
+
+    ctx.fillStyle = "#8B95B0";
+    ctx.font = "11px 'Inter', system-ui, sans-serif";
+    ctx.fillText("Click '⚡ Run Live Registration' to inspect", 150, 110);
+}
+
+function loadRawImages(p) {
+    const canvasRef = document.getElementById("canvas-ref");
+    const canvasSrch = document.getElementById("canvas-srch");
+    if (!canvasRef || !canvasSrch) return;
+
+    const ctxRef = canvasRef.getContext("2d");
+    const ctxSrch = canvasSrch.getContext("2d");
+
+    // Clear both canvases immediately
+    ctxRef.clearRect(0, 0, 1000, 1000);
+    ctxSrch.clearRect(0, 0, 1000, 1000);
+
+    // Load Reference Template
+    const refImg = new Image();
+    refImg.crossOrigin = "anonymous";
+    refImg.src = "/dataset_images/" + (p.reference_path || "reference/" + p.pair_id + ".png");
+    refImg.onload = () => {
+        currentRefImg = refImg;
+        ctxRef.clearRect(0, 0, 1000, 1000);
+        ctxRef.drawImage(refImg, 0, 0, 1000, 1000);
+    };
+    if (refImg.complete && refImg.naturalWidth > 0) {
+        currentRefImg = refImg;
+        ctxRef.drawImage(refImg, 0, 0, 1000, 1000);
+    }
+
+    // Load Search Wafer Image (RAW ONLY — NEVER DRAW BOXES HERE)
+    const srchImg = new Image();
+    srchImg.crossOrigin = "anonymous";
+    srchImg.src = "/dataset_images/" + (p.search_path || "search/" + p.pair_id + ".png");
+    srchImg.onload = () => {
+        currentSrchImg = srchImg;
+        ctxSrch.clearRect(0, 0, 1000, 1000);
+        ctxSrch.drawImage(srchImg, 0, 0, 1000, 1000);
+    };
+    if (srchImg.complete && srchImg.naturalWidth > 0) {
+        currentSrchImg = srchImg;
+        ctxSrch.drawImage(srchImg, 0, 0, 1000, 1000);
+    }
+}
+
+// ── ONLY AFTER CLICKING RUN LIVE REGISTRATION: DRAW BOXES & CLOSE-UP ──
+function runLive() {
+    const p = META[activeIdx];
+    if (!p) return;
+
+    const btn = document.getElementById("btn-live");
+    btn.innerText = "⏳ Registering...";
+    btn.disabled = true;
+
+    const pill = document.getElementById("live-pill");
+    if (pill) {
+        pill.className = "live-pill running";
+        pill.innerText = "INSPECTING";
+    }
+    setText("live-status", "Running 5-Phase Sub-Pixel Metrology Cascade...");
+    setText("live-latency", "Measuring single-core CPU runtime...");
+
+    fetch("/api/localize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(p)
+    })
+    .then(r => r.json())
+    .then(res => {
+        btn.innerText = "⚡ Run Live Registration";
+        btn.disabled = false;
+
+        if (res.status === "success") {
+            const isFound = (res.found === 1);
+            const predX = parseFloat(res.pred_x);
+            const predY = parseFloat(res.pred_y);
+            const predScale = parseFloat(res.scale);
+            const predAngle = parseFloat(res.angle);
+            const predScore = parseFloat(res.score);
+            const latencyS = parseFloat(res.latency_s);
+
+            // Ground truth for comparison
+            const gtPresent = (p.gt_present !== "0" && p.gt_present !== 0 && String(p.gt_present) !== "false");
+            const gtX = parseFloat(p.gt_x || "0");
+            const gtY = parseFloat(p.gt_y || "0");
+            const gtScale = parseFloat(p.gt_scale || p.zoom || "10.0");
+            const gtTheta = parseFloat(p.gt_theta || p.theta || "0.0");
+
+            const err = (gtPresent && isFound) ? Math.hypot(predX - gtX, predY - gtY) : 0;
+            const deltaX = (gtPresent && isFound) ? (predX - gtX) : 0;
+            const deltaY = (gtPresent && isFound) ? (predY - gtY) : 0;
+
+            // 1. UPDATE LIVE INFERENCE MONITOR CARD IN SIDEBAR
+            if (pill) {
+                pill.className = isFound ? "live-pill done" : "live-pill ready";
+                pill.innerText = isFound ? "MATCHED" : "REJECTED";
+            }
+            setText("live-pair", `${res.pair_id} · ${p.architecture || "dram"}`);
+            setText("live-status", isFound ? (err <= 1.0 ? "✓ Target Localized (< 1.0px Sub-Pixel)" : "⚠ Target Localized (Review Tier)") : "🚫 Decoy Rejection (Target Absent)");
+            setText("live-latency", `${latencyS.toFixed(3)} s (${Math.round(latencyS * 1000)} ms)`);
+            setText("live-path", predScore >= 0.85 ? "Path A (Direct Fast Peak)" : "Path B (Siamese CNN Verifier)");
+            setText("live-pos", isFound ? `(${predX.toFixed(3)}, ${predY.toFixed(3)})` : "ABSENT / REJECTED");
+            setText("live-scale-angle", `${predScale.toFixed(4)} nm/px | ${(predAngle >= 0 ? "+" : "") + predAngle.toFixed(2)}°`);
+            setText("live-score", `${predScore.toFixed(4)} (Platt Calibrated)`);
+
+            // 2. UPDATE PAIR METROLOGY READOUT IN SIDEBAR
+            setText("m-gt", gtPresent ? `(${gtX.toFixed(1)}, ${gtY.toFixed(1)})` : "ABSENT (Decoy)");
+            setText("m-pred", isFound ? `(${predX.toFixed(1)}, ${predY.toFixed(1)})` : "REJECTED");
+            const errEl = document.getElementById("m-error");
+            if (errEl) {
+                errEl.innerText = (gtPresent && isFound) ? err.toFixed(3) + " px" : "N/A";
+                errEl.className = "mval " + (!gtPresent || !isFound ? "" : err <= 1.0 ? "pass" : err <= 2.0 ? "warn" : "fail");
+            }
+            setText("m-theta", (predAngle >= 0 ? "+" : "") + predAngle.toFixed(2) + "°");
+            setText("m-scale", predScale > 1 ? predScale.toFixed(2) + " nm/px" : (predScale > 0 ? (1/predScale).toFixed(2) + " nm/px" : "—"));
+            setText("m-score", predScore.toFixed(4));
+            setText("m-delta", (gtPresent && isFound) ? `ΔX: ${(deltaX >= 0 ? "+" : "") + deltaX.toFixed(3)}px | ΔY: ${(deltaY >= 0 ? "+" : "") + deltaY.toFixed(3)}px` : "N/A");
+
+            updateVerdict(gtPresent, isFound, err);
+
+            // 3. NOW DRAW GT & PREDICTION BOXES ON SEARCH WAFER CANVAS
+            const canvasSrch = document.getElementById("canvas-srch");
+            if (canvasSrch) {
+                const ctxSrch = canvasSrch.getContext("2d");
+                renderSearchCanvas(ctxSrch, currentSrchImg, gtX, gtY, gtScale, gtTheta, gtPresent, predX, predY, predScale, predAngle, isFound);
+            }
+
+            // 4. NOW DRAW HIGH-MAGNIFICATION (4×) CLOSE-UP VIEW IN SIDEBAR
+            const closePill = document.getElementById("closeup-pill");
+            if (closePill) {
+                closePill.className = "live-pill done";
+                closePill.innerText = "4× ACTIVE";
+            }
+            renderCloseupCanvas(gtX, gtY, gtScale, gtTheta, gtPresent, predX, predY, predScale, predAngle, isFound, err);
+
+        } else {
+            if (pill) {
+                pill.className = "live-pill ready";
+                pill.innerText = "ERROR";
+            }
+            setText("live-status", "Registration Error: " + (res.message || "Pipeline failure"));
+            setText("live-latency", "Failed");
+        }
+    })
+    .catch(e => {
+        btn.innerText = "⚡ Run Live Registration";
+        btn.disabled = false;
+        if (pill) {
+            pill.className = "live-pill ready";
+            pill.innerText = "ERROR";
+        }
+        setText("live-status", "API Connection Failed: " + e);
+        setText("live-latency", "Timeout");
+    });
+}
+
+function updateVerdict(gtPresent, predFound, err) {
+    const verdictEl = document.getElementById("m-verdict");
+    if (!verdictEl) return;
+    if (!gtPresent && !predFound) {
+        verdictEl.innerText = "✓ TRUE NEGATIVE (Correct Rejection)";
+        verdictEl.className = "mval pass";
+    } else if (!gtPresent && predFound) {
+        verdictEl.innerText = "✗ FALSE POSITIVE (False Alarm)";
+        verdictEl.className = "mval fail";
+    } else if (gtPresent && !predFound) {
+        verdictEl.innerText = "✗ FALSE NEGATIVE (Missed Target)";
+        verdictEl.className = "mval fail";
+    } else if (err <= 1.0) {
+        verdictEl.innerText = "✓ SUB-PIXEL PASS (< 1.0 px)";
+        verdictEl.className = "mval pass";
+    } else if (err <= 2.0) {
+        verdictEl.innerText = "⚠ REVIEW TIER (1.0 – 2.0 px)";
+        verdictEl.className = "mval warn";
+    } else {
+        verdictEl.innerText = "✗ LOCALIZATION FAIL (> 2.0 px)";
+        verdictEl.className = "mval fail";
+    }
+}
+
+// ── Search Canvas with GT (Green) and Pred (Red) Bounding Boxes ──
+function renderSearchCanvas(ctx, img, gtX, gtY, gtScale, gtTheta, gtPresent, predX, predY, predScale, predTheta, predFound) {
+    ctx.clearRect(0, 0, 1000, 1000);
+
+    // 1. Draw base wafer image
+    if (img && img.complete && img.naturalWidth > 0) {
+        ctx.drawImage(img, 0, 0, 1000, 1000);
+    }
+
+    // 2. Draw Ground Truth Box (Green)
+    if (gtPresent && !isNaN(gtX) && !isNaN(gtY) && (gtX > 0 || gtY > 0)) {
+        const zoom = (gtScale && gtScale > 0) ? gtScale : 10.0;
+        const boxSize = (zoom > 1.0) ? (1000.0 / zoom) : (1000.0 * zoom);
+        const x0 = gtX - boxSize / 2;
+        const y0 = gtY - boxSize / 2;
+
+        ctx.save();
+        if (gtTheta && gtTheta !== 0) {
+            ctx.translate(gtX, gtY);
+            ctx.rotate((gtTheta * Math.PI) / 180);
+            ctx.translate(-gtX, -gtY);
+        }
+
+        ctx.fillStyle = "rgba(52, 211, 153, 0.22)";
+        ctx.fillRect(x0, y0, boxSize, boxSize);
+
+        ctx.strokeStyle = "#34D399";
+        ctx.lineWidth = 4;
+        ctx.strokeRect(x0, y0, boxSize, boxSize);
+
+        ctx.strokeStyle = "#34D399";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(gtX - 12, gtY); ctx.lineTo(gtX + 12, gtY);
+        ctx.moveTo(gtX, gtY - 12); ctx.lineTo(gtX, gtY + 12);
+        ctx.stroke();
+
+        ctx.fillStyle = "#34D399";
+        ctx.fillRect(x0, Math.max(4, y0 - 26), 46, 22);
+        ctx.fillStyle = "#0B0F1A";
+        ctx.font = "bold 15px 'JetBrains Mono', monospace";
+        ctx.fillText("GT", x0 + 13, Math.max(4, y0 - 26) + 16);
+
+        ctx.restore();
+    }
+
+    // 3. Draw Prediction Box (Red)
+    if (predFound && !isNaN(predX) && !isNaN(predY) && (predX > 0 || predY > 0)) {
+        const z = (predScale && predScale > 0) ? predScale : 0.1;
+        const pBoxSize = (z > 1.0) ? (1000.0 / z) : (1000.0 * z);
+        const px0 = predX - pBoxSize / 2;
+        const py0 = predY - pBoxSize / 2;
+
+        ctx.save();
+        if (predTheta && predTheta !== 0) {
+            ctx.translate(predX, predY);
+            ctx.rotate((predTheta * Math.PI) / 180);
+            ctx.translate(-predX, -predY);
+        }
+
+        ctx.fillStyle = "rgba(248, 113, 113, 0.22)";
+        ctx.fillRect(px0, py0, pBoxSize, pBoxSize);
+
+        ctx.strokeStyle = "#F87171";
+        ctx.lineWidth = 4;
+        ctx.strokeRect(px0, py0, pBoxSize, pBoxSize);
+
+        ctx.strokeStyle = "#F87171";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(predX - 12, predY); ctx.lineTo(predX + 12, predY);
+        ctx.moveTo(predX, predY - 12); ctx.lineTo(predX, predY + 12);
+        ctx.stroke();
+
+        const tagX = px0 + pBoxSize - 64;
+        const tagY = Math.max(4, py0 - 26);
+        ctx.fillStyle = "#F87171";
+        ctx.fillRect(tagX, tagY, 64, 22);
+        ctx.fillStyle = "#FFFFFF";
+        ctx.font = "bold 14px 'JetBrains Mono', monospace";
+        ctx.fillText("PRED", tagX + 14, tagY + 16);
+
+        ctx.restore();
+    }
+}
+
+// ── High-Magnification Close-Up View (4× Loupe) in the Sidebar ──
+function renderCloseupCanvas(gtX, gtY, gtScale, gtTheta, gtPresent, predX, predY, predScale, predAngle, isFound, err) {
+    const canvasClose = document.getElementById("canvas-closeup");
+    const canvasSrch = document.getElementById("canvas-srch");
+    if (!canvasClose) return;
+
+    const ctx = canvasClose.getContext("2d");
+    const cW = 300;
+    const cH = 180;
+    ctx.clearRect(0, 0, cW, cH);
+
+    if (!gtPresent && !isFound) {
+        ctx.fillStyle = "#060A14";
+        ctx.fillRect(0, 0, cW, cH);
+        ctx.fillStyle = "#34D399";
+        ctx.font = "bold 14px 'JetBrains Mono', monospace";
+        ctx.textAlign = "center";
+        ctx.fillText("✓ DECOY CORRECTLY REJECTED", cW / 2, 85);
+        ctx.fillStyle = "#8B95B0";
+        ctx.font = "11px system-ui, sans-serif";
+        ctx.fillText("No target feature present in wafer", cW / 2, 110);
+        return;
+    }
+
+    const targetX = isFound ? predX : gtX;
+    const targetY = isFound ? predY : gtY;
+
+    // Crop size in wafer coordinates (~160×96 px for 4× magnification)
+    const cropW = 160;
+    const cropH = 96;
+    const cropX0 = Math.max(0, Math.min(1000 - cropW, Math.round(targetX - cropW / 2)));
+    const cropY0 = Math.max(0, Math.min(1000 - cropH, Math.round(targetY - cropH / 2)));
+
+    const sX = cW / cropW;
+    const sY = cH / cropH;
+
+    // 1. Draw magnified wafer background directly from image or canvasSrch
+    if (currentSrchImg && currentSrchImg.complete && currentSrchImg.naturalWidth > 0) {
+        try {
+            ctx.drawImage(currentSrchImg, cropX0, cropY0, cropW, cropH, 0, 0, cW, cH);
+        } catch (e) {
+            ctx.fillStyle = "#0B0F1A";
+            ctx.fillRect(0, 0, cW, cH);
+        }
+    } else if (canvasSrch) {
+        try {
+            ctx.drawImage(canvasSrch, cropX0, cropY0, cropW, cropH, 0, 0, cW, cH);
+        } catch (e) {
+            ctx.fillStyle = "#0B0F1A";
+            ctx.fillRect(0, 0, cW, cH);
+        }
+    } else {
+        ctx.fillStyle = "#0B0F1A";
+        ctx.fillRect(0, 0, cW, cH);
+    }
+
+    // High-contrast translucent dark wash for crisp overlay reticles
+    ctx.fillStyle = "rgba(6, 10, 20, 0.20)";
+    ctx.fillRect(0, 0, cW, cH);
+
+    // 2. Draw GT Reticle in Close-Up (Green)
+    if (gtPresent && !isNaN(gtX) && !isNaN(gtY)) {
+        const gx = (gtX - cropX0) * sX;
+        const gy = (gtY - cropY0) * sY;
+        const zoom = (gtScale && gtScale > 0) ? gtScale : 10.0;
+        const gBox = ((zoom > 1.0) ? (1000.0 / zoom) : (1000.0 * zoom)) * sX;
+
+        ctx.save();
+        ctx.translate(gx, gy);
+        ctx.rotate((gtTheta * Math.PI) / 180);
+        ctx.translate(-gx, -gy);
+
+        ctx.strokeStyle = "#34D399";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(gx - gBox / 2, gy - gBox / 2, gBox, gBox);
+        ctx.fillStyle = "rgba(52, 211, 153, 0.15)";
+        ctx.fillRect(gx - gBox / 2, gy - gBox / 2, gBox, gBox);
+        ctx.restore();
+
+        // GT Crosshair
+        ctx.strokeStyle = "#34D399";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(gx - 18, gy); ctx.lineTo(gx + 18, gy);
+        ctx.moveTo(gx, gy - 18); ctx.lineTo(gx, gy + 18);
+        ctx.stroke();
+
+        ctx.fillStyle = "#34D399";
+        ctx.font = "bold 11px 'JetBrains Mono', monospace";
+        ctx.textAlign = "left";
+        ctx.fillText(`GT (${gtX.toFixed(1)}, ${gtY.toFixed(1)})`, Math.max(6, gx - 40), Math.max(16, gy - 20));
+    }
+
+    // 3. Draw Pred Reticle in Close-Up (Red)
+    if (isFound && !isNaN(predX) && !isNaN(predY)) {
+        const px = (predX - cropX0) * sX;
+        const py = (predY - cropY0) * sY;
+        const z = (predScale && predScale > 0) ? predScale : 0.1;
+        const pBox = ((z > 1.0) ? (1000.0 / z) : (1000.0 * z)) * sX;
+
+        ctx.save();
+        ctx.translate(px, py);
+        ctx.rotate((predAngle * Math.PI) / 180);
+        ctx.translate(-px, -py);
+
+        ctx.strokeStyle = "#F87171";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(px - pBox / 2, py - pBox / 2, pBox, pBox);
+        ctx.fillStyle = "rgba(248, 113, 113, 0.15)";
+        ctx.fillRect(px - pBox / 2, py - pBox / 2, pBox, pBox);
+        ctx.restore();
+
+        // Pred Crosshair
+        ctx.strokeStyle = "#F87171";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(px - 18, py); ctx.lineTo(px + 18, py);
+        ctx.moveTo(px, py - 18); ctx.lineTo(px, py + 18);
+        ctx.stroke();
+
+        ctx.fillStyle = "#F87171";
+        ctx.font = "bold 11px 'JetBrains Mono', monospace";
+        ctx.textAlign = "left";
+        ctx.fillText(`PRED (${predX.toFixed(1)}, ${predY.toFixed(1)})`, Math.max(6, px - 40), Math.min(cH - 8, py + 26));
+    }
+
+    // 4. Sub-Pixel Alignment Vector Line & Error Readout
+    if (gtPresent && isFound) {
+        const gx = (gtX - cropX0) * sX;
+        const gy = (gtY - cropY0) * sY;
+        const px = (predX - cropX0) * sX;
+        const py = (predY - cropY0) * sY;
+
+        ctx.strokeStyle = "#38BDF8";
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 3]);
+        ctx.beginPath();
+        ctx.moveTo(gx, gy); ctx.lineTo(px, py);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Top-right sub-pixel error badge
+        ctx.fillStyle = "rgba(11, 15, 26, 0.88)";
+        ctx.fillRect(cW - 96, 6, 90, 22);
+        ctx.strokeStyle = "#38BDF8";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(cW - 96, 6, 90, 22);
+        ctx.fillStyle = "#38BDF8";
+        ctx.font = "bold 11px 'JetBrains Mono', monospace";
+        ctx.textAlign = "center";
+        ctx.fillText(`Err: ${err.toFixed(3)}px`, cW - 51, 21);
+    }
+}
+
+function filterPairs() {
+    activeIdx = 0;
+    renderPairList();
+    if (META.length > 0) selectPair(0);
+}
+
+function switchTab(tabId) {
+    document.querySelectorAll(".nav-tab").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
+    const btn = document.getElementById("btn-" + tabId);
+    const tab = document.getElementById("tab-" + tabId);
+    if (btn) btn.classList.add("active");
+    if (tab) tab.classList.add("active");
+}
+
+</script>
+</body>
+</html>

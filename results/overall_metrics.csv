@@ -1,0 +1,13 @@
+Metric_Tier,Reference_220Pairs,Stress_220Pairs
+Total_Evaluated_Pairs,220,220
+Sub_1.0px_Precision_R1,90.6%,86.2%
+Sub_2.0px_Review_Accuracy_R2,98.1%,86.9%
+Sub_3.0px_Accuracy_R3,98.1%,86.9%
+Sub_4.0px_Accuracy_R4,98.1%,86.9%
+Sub_5.0px_Accuracy_R5,98.1%,86.9%
+Median_Localization_Error_px,0.3764,0.2265
+Target_Absent_Recall_FN,100.0% (FN=0),100.0% (FN=0)
+Rejection_F1_Score,0.9605,0.9639
+Mean_Scale_Recovery_Credit,0.8951,0.8974
+Mean_Angle_Recovery_Credit,0.9712,0.9826
+CPU_Median_Latency_s,0.964s,0.985s

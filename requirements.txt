@@ -1,0 +1,33 @@
+# =====================================================================
+# DRIFT-SENSE PHASE 2: SUB-PIXEL WAFER METROLOGY & REGISTRATION ENGINE
+# Applied Materials Hackathon (PS2 - Unknown Pose Wafer Localization)
+# Team Techtonics · Chennai Institute of Technology
+#
+# NOTE: In strict accordance with the hackathon rules and industrial
+# fab metrology tool constraints, all models and pipelines run
+# EXCLUSIVELY on single-core CPU (zero GPU hardware dependency).
+# =====================================================================
+
+# ── Core Numerical & Scientific Computing ──
+numpy>=1.24.0,<2.3.0
+scipy>=1.10.0
+
+# ── Computer Vision & Digital Image Processing ──
+opencv-python>=4.8.0
+Pillow>=9.5.0
+
+# ── Deep Learning Inference & Verification (Single-Core CPU Only) ──
+torch>=2.0.0
+torchvision>=0.15.0
+
+# ── Diagnostics, Metrology Plotting & Reporting ──
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# ── Data Science, Benchmark Scoring & Tabular Analytics ──
+pandas>=1.5.0
+scikit-learn>=1.2.0
+
+# ── Utilities, CLI Progress & HTTP Networking ──
+tqdm>=4.65.0
+requests>=2.28.0

@@ -1,0 +1,7 @@
+pair_id,set_category,pattern_code,pattern_name,reference_path,search_path,gt_found,gt_x,gt_y,gt_norm_x,gt_norm_y,scale_factor,rotation_deg,noise_dose,render_time_s
+PH2_P0_003,SET_B,P0,DRAM_CELL,submission_dataset/phase2_stress_20pairs/set_b/reference/ref_003.png,submission_dataset/phase2_stress_20pairs/set_b/search/search_003.png,1,567.762,86.963,0.5678,0.087,0.1065,4.49,1176,16.9739
+PH2_P4_001,SET_B,P4,CONTACT_ARRAY,submission_dataset/phase2_stress_20pairs/set_b/reference/ref_008.png,submission_dataset/phase2_stress_20pairs/set_b/search/search_008.png,1,181.585,494.26,0.1816,0.4943,0.0897,4.64,1218,17.8164
+PH2_P5_001,SET_B,P5,LOCAL_INTERCONNECT,submission_dataset/phase2_stress_20pairs/set_b/reference/ref_009.png,submission_dataset/phase2_stress_20pairs/set_b/search/search_009.png,1,351.149,86.255,0.3511,0.0863,0.0901,-4.47,1395,9.0347
+PH2_P7_002,SET_B,P7,ACTIVE_CELL,submission_dataset/phase2_stress_20pairs/set_b/reference/ref_013.png,submission_dataset/phase2_stress_20pairs/set_b/search/search_013.png,1,426.879,476.988,0.4269,0.477,0.0946,-0.45,836,10.1254
+PH2_P8_004,SET_B,P8,FINFET_FULL_CELL,submission_dataset/phase2_stress_20pairs/set_b/reference/ref_017.png,submission_dataset/phase2_stress_20pairs/set_b/search/search_017.png,1,146.867,137.556,0.1469,0.1376,0.1058,0.76,1584,1.4503
+PH2_P8_005,SET_B,P8,FINFET_FULL_CELL,submission_dataset/phase2_stress_20pairs/set_b/reference/ref_018.png,submission_dataset/phase2_stress_20pairs/set_b/search/search_018.png,1,751.806,725.833,0.7518,0.7258,0.0911,-4.32,1103,1.3496

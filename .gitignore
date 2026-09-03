@@ -1,0 +1,37 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+*.tmp
+
+# Virtual Environment
+venv/
+env/
+.venv/
+
+# Scratch & Temporary Testing Folders
+scratch/
+test_profile/
+dataset/
+phase2_dataset_reference/
+phase2_dataset_stress/
+phase_2_reference_generator/
+phase_2_results/
+
+# Intermediate Non-Submission CSVs
+sample_preds.csv
+baseline_predictions.csv
+predictions_official_jury.csv
+predictions_rgb.csv
+predictions_stress.csv
+
+# OS metadata
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Media
+*.mp4
+*.mov
+*.avi
