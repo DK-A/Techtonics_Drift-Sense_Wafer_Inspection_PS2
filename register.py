@@ -57,6 +57,9 @@ def main():
     if not args.output and not (args.pos_args and len(args.pos_args) >= 2):
         print(f"[CLI NOTICE: Fallback Activated] No '--output' argument specified. Defaulting to '{output_csv}'.\n")
 
+    weights_path = args.weights
+    fast_mode = args.fast
+
     if not os.path.exists(input_csv):
         raise FileNotFoundError(f"Input manifest not found: {input_csv}")
 
