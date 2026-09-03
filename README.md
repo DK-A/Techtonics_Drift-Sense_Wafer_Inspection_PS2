@@ -279,7 +279,31 @@ Below is the complete, official empirical verification across the **Phase 2 Refe
 
 ---
 
-### 6.2 Key Diagnostic Plots (PR Curve, Error CDF, Per-Pattern, Noise Progression)
+### 6.2 Granular Set-Wise Performance Breakdown (Sets A, B, C, D across Both Suites)
+
+Below is the granular metrology performance audited across all **4 individual dataset partitions** (`Set A`, `Set B`, `Set C`, `Set D`) for both the Reference Benchmark and the Heavy Stress Suite:
+
+#### Table 6.2A: Reference Benchmark (220 Pairs) — Granular Set Breakdown
+| Dataset Partition / Subset | Evaluated Pairs | Confusion Matrix (TP / FN / FP / TN) | Overall Accuracy | Sub-1.0px ($R_1$) | Sub-2.0px ($R_2$) | Median Error | Rejection F1 |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Set A: Nominal SEM** | **70 Pairs** | 70 / 0 / 0 / 0 | **100.0%** | **98.6%** (69/70) | **100.0%** (70/70) | **0.2890 px** | **1.0000** |
+| **Set B: Degraded SEM Stress** | **70 Pairs** | 68 / 2 / 0 / 0 | **97.1%** | **82.9%** (58/70) | **97.1%** (68/70) | **0.5709 px** | **0.9855** |
+| **Set C: Target-Absent Decoys** | **60 Pairs** | 0 / 0 / 11 / 49 | **81.7%** | N/A (Decoys) | N/A (Decoys) | N/A (Decoys) | **0.8991** |
+| **Set D: RGB Optical Analogue** | **20 Pairs** | 20 / 0 / 0 / 0 | **100.0%** | **95.0%** (19/20) | **95.0%** (19/20) | **0.4140 px** | **1.0000** |
+| **TOTAL REFERENCE BENCHMARK** | **220 Pairs** | **158 / 2 / 11 / 49** | **94.1%** | **90.6%** (145/160) | **98.1%** (157/160) | **0.3764 px** | **0.9605** |
+
+#### Table 6.2B: Heavy Stress Validation Suite (220 Pairs) — Granular Set Breakdown
+| Dataset Partition / Subset | Evaluated Pairs | Confusion Matrix (TP / FN / FP / TN) | Overall Accuracy | Sub-1.0px ($R_1$) | Sub-2.0px ($R_2$) | Median Error | Rejection F1 |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Set A: Clean SEM Baseline** | **70 Pairs** | 70 / 0 / 0 / 0 | **100.0%** | **84.3%** (59/70) | **84.3%** (59/70) | **0.2004 px** | **1.0000** |
+| **Set B: Extreme SEM Pose Stress** | **70 Pairs** | 70 / 0 / 0 / 0 | **100.0%** | **85.7%** (60/70) | **87.1%** (61/70) | **0.1941 px** | **1.0000** |
+| **Set C: Target-Absent Decoys** | **60 Pairs** | 0 / 0 / 12 / 48 | **80.0%** | N/A (Decoys) | N/A (Decoys) | N/A (Decoys) | **0.8889** |
+| **Set D: Multi-Spectral RGB** | **20 Pairs** | 20 / 0 / 0 / 0 | **100.0%** | **95.0%** (19/20) | **95.0%** (19/20) | **0.3866 px** | **1.0000** |
+| **TOTAL HEAVY STRESS SUITE** | **220 Pairs** | **160 / 0 / 12 / 48** | **94.5%** | **86.2%** (138/160) | **86.9%** (139/160) | **0.2265 px** | **0.9639** |
+
+---
+
+### 6.3 Key Diagnostic Plots (PR Curve, Error CDF, Per-Pattern, Noise Progression)
 
 ![Key Diagnostic Plots Grid](docs/assets/key_diagnostic_plots.png)
 
@@ -287,7 +311,7 @@ Below is the complete, official empirical verification across the **Phase 2 Refe
 
 ---
 
-### 6.3 220-Pair Benchmark Confusion Matrix (Reference & Stress Suites)
+### 6.4 220-Pair Benchmark Confusion Matrix (Reference & Stress Suites)
 
 ![220-Pair Benchmark Confusion Matrix Image](docs/assets/confusion_matrix.png)
 
@@ -298,7 +322,7 @@ Below is the complete, official empirical verification across the **Phase 2 Refe
 
 ---
 
-### 6.4 Pattern Architecture Summary (All 9 Semiconductor Families & Reference Patterns)
+### 6.5 Pattern Architecture Summary (All 9 Semiconductor Families & Reference Patterns)
 
 ![3x3 Multi-Pattern Inspection Grid](docs/assets/stress_suite_collage.png)
 
@@ -320,7 +344,7 @@ Below is the summary table detailing all **9 Semiconductor Pattern Architecture 
 
 ---
 
-### 6.5 Technology Node Architecture Variant Breakdown
+### 6.6 Technology Node Architecture Variant Breakdown
 
 Below is the detailed performance breakdown across specific **DRAM & FinFET Technology Node Variants** (`dram_1x`, `dram_dense`, `dram_loose`, `finfet_7nm`, `finfet_14nm`, etc.) from the official Applied Materials benchmark generator:
 
