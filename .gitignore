@@ -16,7 +16,9 @@ test_profile/
 dataset/
 phase2_dataset_reference/
 phase2_dataset_stress/
-phase_2_reference_generator/
+phase_2_reference_generator/reference/
+phase_2_reference_generator/search/
+phase_2_reference_generator/*.png
 phase_2_results/
 
 # Intermediate Non-Submission CSVs

@@ -43,7 +43,7 @@ def main():
         print(f" Output Directory: {args.output}")
         print(f"=========================================================================================")
 
-        cmd = f'python "{ref_script}" --output-dir "{args.output}" --pairs {args.pairs} --seed {args.seed}'
+        cmd = f'"{sys.executable}" "{ref_script}" --output "{args.output}" --pairs {args.pairs} --seed {args.seed}'
         subprocess.run(cmd, shell=True, cwd=base_dir)
 
     elif args.mode == "stress":
@@ -56,7 +56,7 @@ def main():
         print(f" Output Directory: {args.output}")
         print(f"=========================================================================================")
 
-        cmd = f'python "{stress_script}" --output "{args.output}" --pairs {args.pairs} --seed {args.seed}'
+        cmd = f'"{sys.executable}" "{stress_script}" --output "{args.output}" --pairs {args.pairs} --seed {args.seed}'
         subprocess.run(cmd, shell=True, cwd=base_dir)
 
 if __name__ == "__main__":

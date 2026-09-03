@@ -23,7 +23,6 @@ from multiprocessing import Pool, cpu_count
 
 sys.path.insert(0, os.path.abspath("."))
 
-from generate_dataset import PATTERNS
 from src.utils import (
     render_class1_fin_array_field,
     render_class2_fin_cut_field,
@@ -416,6 +415,7 @@ def generate_phase2_dataset(out_dir="phase2_dataset", total_pairs=220, include_r
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate Ultra-Fast Direct-Rendering Hackathon Dataset")
+    parser.add_argument("--output", type=str, default=None, help="Output directory")
     parser.add_argument("--out_dir", type=str, default="phase2_dataset", help="Output directory")
     parser.add_argument("--output-dir", type=str, default=None, help="Alias for --out_dir")
     parser.add_argument("--pairs", type=int, default=220, help="Total pairs to generate (220 for full set including Set D)")
@@ -423,5 +423,5 @@ if __name__ == "__main__":
     parser.add_argument("--seed", type=int, default=PHASE2_SEED, help="Random seed")
     args = parser.parse_args()
 
-    target_dir = args.output_dir if args.output_dir is not None else args.out_dir
+    target_dir = args.output or args.output_dir or args.out_dir
     generate_phase2_dataset(out_dir=target_dir, total_pairs=args.pairs, num_workers=args.cores)

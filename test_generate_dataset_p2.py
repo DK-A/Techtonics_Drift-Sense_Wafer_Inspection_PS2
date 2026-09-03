@@ -121,47 +121,55 @@ def render_single_pair(args_tuple):
     return pairs_row, gt_row, meta_row
 
 def main():
-    parser = argparse.ArgumentParser(description="Official Applied Materials Phase 2 220-Pair Dataset Generator")
-    parser.add_argument("--output-dir", type=str, default="test_phase2_dataset", help="Output directory")
+    parser = argparse.ArgumentParser(description="Official Applied Materials Phase 2 Dataset Generator")
+    parser.add_argument("--output-dir", "--output", "--out_dir", type=str, default="test_phase2_dataset", help="Output directory")
+    parser.add_argument("--pairs", type=int, default=220, help="Total pairs to generate (e.g. 220 or 20)")
     parser.add_argument("--seed", type=int, default=20260827, help="Random seed")
     parser.add_argument("--cores", type=int, default=cpu_count(), help="CPU cores for parallel rendering")
     args = parser.parse_args()
 
     os.makedirs(args.output_dir, exist_ok=True)
     print("=" * 100)
-    print(f" OFFICIAL APPLIED MATERIALS PHASE 2 PIPELINE GENERATOR (220 PAIRS, {args.cores} CORES)")
+    print(f" OFFICIAL APPLIED MATERIALS PHASE 2 PIPELINE GENERATOR ({args.pairs} PAIRS, {args.cores} CORES)")
     print(f" Target Folder: {args.output_dir}/")
     print("=" * 100)
 
-    # Build 220 Pair Allocation:
-    # Set A: 80 Pairs (Nominal)
-    # Set B: 70 Pairs (Degraded, Severity 1, 2, 3, 4)
-    # Set C: 50 Pairs (Target-Absent Decoys)
-    # Set D: 20 Pairs (Phase 2 RGB Optical Bonus)
+    # Dynamic Pair Allocation:
+    total_pairs = args.pairs
+    if total_pairs == 220:
+        nA, nB, nC, nD = 70, 70, 60, 20
+    elif total_pairs == 20:
+        nA, nB, nC, nD = 7, 7, 4, 2
+    else:
+        nA = max(1, int(round(total_pairs * 0.32)))
+        nB = max(1, int(round(total_pairs * 0.32)))
+        nC = max(1, int(round(total_pairs * 0.27)))
+        nD = max(0, total_pairs - (nA + nB + nC))
+
     tasks = []
     pair_idx = 1
 
-    # Set A (70 Pairs)
-    for i in range(70):
+    # Set A (Nominal)
+    for i in range(nA):
         arch = ALL_ARCHITECTURES[i % len(ALL_ARCHITECTURES)]
         tasks.append((pair_idx, "SET_A", arch, 0, args.output_dir, args.seed))
         pair_idx += 1
 
-    # Set B (70 Pairs)
-    for i in range(70):
+    # Set B (Degraded, Severity 1, 2, 3, 4)
+    for i in range(nB):
         arch = ALL_ARCHITECTURES[i % len(ALL_ARCHITECTURES)]
         sev = (i % 4) + 1 # Severity 1, 2, 3, 4
         tasks.append((pair_idx, "SET_B", arch, sev, args.output_dir, args.seed))
         pair_idx += 1
 
-    # Set C (60 Pairs)
-    for i in range(60):
+    # Set C (Target-Absent Decoys)
+    for i in range(nC):
         arch = ALL_ARCHITECTURES[i % len(ALL_ARCHITECTURES)]
         tasks.append((pair_idx, "SET_C", arch, 0, args.output_dir, args.seed))
         pair_idx += 1
 
-    # Set D (20 Pairs)
-    for i in range(20):
+    # Set D (Phase 2 RGB Optical Bonus)
+    for i in range(nD):
         arch = ALL_ARCHITECTURES[i % len(ALL_ARCHITECTURES)]
         tasks.append((pair_idx, "SET_D", arch, 0, args.output_dir, args.seed))
         pair_idx += 1
