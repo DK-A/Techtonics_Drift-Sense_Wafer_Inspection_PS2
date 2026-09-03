@@ -419,7 +419,7 @@ if __name__ == "__main__":
     parser.add_argument("--out_dir", type=str, default="phase2_dataset", help="Output directory")
     parser.add_argument("--output-dir", type=str, default=None, help="Alias for --out_dir")
     parser.add_argument("--pairs", type=int, default=220, help="Total pairs to generate (220 for full set including Set D)")
-    parser.add_argument("--cores", type=int, default=8, help="CPU cores to use for multiprocessing")
+    parser.add_argument("--cores", type=int, default=2, help="CPU cores to use for multiprocessing (default: 2)")
     parser.add_argument("--seed", type=int, default=PHASE2_SEED, help="Random seed")
     args = parser.parse_args()
 

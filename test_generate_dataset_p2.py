@@ -125,7 +125,7 @@ def main():
     parser.add_argument("--output-dir", "--output", "--out_dir", type=str, default="test_phase2_dataset", help="Output directory")
     parser.add_argument("--pairs", type=int, default=220, help="Total pairs to generate (e.g. 220 or 20)")
     parser.add_argument("--seed", type=int, default=20260827, help="Random seed")
-    parser.add_argument("--cores", type=int, default=cpu_count(), help="CPU cores for parallel rendering")
+    parser.add_argument("--cores", type=int, default=2, help="CPU cores for parallel rendering (default: 2)")
     args = parser.parse_args()
 
     os.makedirs(args.output_dir, exist_ok=True)

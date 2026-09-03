@@ -27,6 +27,7 @@ def main():
     parser.add_argument("--output", "--output-dir", "--out_dir", type=str, default="submission_dataset/phase2_reference_220pairs", help="Output directory path")
     parser.add_argument("--pairs", type=int, default=220, help="Total number of dataset pairs to generate (e.g. 220 or 20)")
     parser.add_argument("--seed", type=int, default=42, help="Random seed for provably reproducible dataset generation")
+    parser.add_argument("--cores", type=int, default=2, help="CPU cores to use for rendering (default: 2)")
     args = parser.parse_args()
 
     base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -39,11 +40,11 @@ def main():
             ref_script = os.path.join(base_dir, "phase_2_reference_generator", "generator", "generate_phase2_samples.py")
         
         print(f"=========================================================================================")
-        print(f" GENERATING PHASE 2 REFERENCE DATASET ({args.pairs} PAIRS, SEED={args.seed})")
+        print(f" GENERATING PHASE 2 REFERENCE DATASET ({args.pairs} PAIRS, {args.cores} CPU CORES, SEED={args.seed})")
         print(f" Output Directory: {args.output}")
         print(f"=========================================================================================")
 
-        cmd = f'"{sys.executable}" "{ref_script}" --output "{args.output}" --pairs {args.pairs} --seed {args.seed}'
+        cmd = f'"{sys.executable}" "{ref_script}" --output "{args.output}" --pairs {args.pairs} --seed {args.seed} --cores {args.cores}'
         subprocess.run(cmd, shell=True, cwd=base_dir)
 
     elif args.mode == "stress":
@@ -52,11 +53,11 @@ def main():
             stress_script = os.path.join(base_dir, "generate_phase2_stress.py")
 
         print(f"=========================================================================================")
-        print(f" GENERATING PHASE 2 HEAVY STRESS DATASET ({args.pairs} PAIRS, SEED={args.seed})")
+        print(f" GENERATING PHASE 2 HEAVY STRESS DATASET ({args.pairs} PAIRS, {args.cores} CPU CORES, SEED={args.seed})")
         print(f" Output Directory: {args.output}")
         print(f"=========================================================================================")
 
-        cmd = f'"{sys.executable}" "{stress_script}" --output "{args.output}" --pairs {args.pairs} --seed {args.seed}'
+        cmd = f'"{sys.executable}" "{stress_script}" --output "{args.output}" --pairs {args.pairs} --seed {args.seed} --cores {args.cores}'
         subprocess.run(cmd, shell=True, cwd=base_dir)
 
 if __name__ == "__main__":
