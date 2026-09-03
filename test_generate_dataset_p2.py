@@ -198,7 +198,7 @@ def main():
         writer.writerows(meta_rows)
 
     print("-" * 100)
-    print(f" SUCCESS: Rendered 220 Official Phase 2 Pairs in {time.perf_counter() - t0:.2f}s!")
+    print(f" SUCCESS: Rendered {len(results)} Official Phase 2 Pairs in {time.perf_counter() - t0:.2f}s!")
     print(f"  * Public File: {os.path.join(args.output_dir, 'pairs.csv')}")
     print(f"  * GT File    : {os.path.join(args.output_dir, 'ground_truth.csv')}")
     print(f"  * Metadata   : {os.path.join(args.output_dir, 'metadata.csv')}")
