@@ -13,7 +13,7 @@
 * **Team Name**: Techtonics
 * **Problem Statement**: PS2 — Drift-Sense Phase 2: Unknown Pose Wafer Pattern Localization & Navigation Recovery
 * **Institution / College**: Chennai Institute of Technology
-* **Repository**: `DK-A/Techtonics_Drift-Sense_Wafer_Inspection_Phase2`
+* **Repository**: `DK-A/Techtonics_Drift-Sense_Wafer_Inspection_PS2`
 
 ---
 
@@ -22,10 +22,10 @@
 ### Step 1: Clone the Repository
 ```bash
 # Clone the repository from GitHub
-git clone https://github.com/DK-A/Techtonics_Drift-Sense_Wafer_Inspection_Phase2.git
+git clone https://github.com/DK-A/Techtonics_Drift-Sense_Wafer_Inspection_PS2.git
 
 # Navigate into the repository directory
-cd Techtonics_Drift-Sense_Wafer_Inspection_Phase2
+cd Techtonics_Drift-Sense_Wafer_Inspection_PS2
 ```
 
 ### Step 2: Set Up Python Virtual Environment (Recommended)
