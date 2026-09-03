@@ -165,16 +165,16 @@ submission/
 ## 4. Deep Learning Model & Retraining Details (`train.py`)
 
 ### 4.1 Model Architecture & Checkpoint
-* **Model Checkpoint**: Stored in `model/phase5_reranker.pt` (~3.2 MB lightweight footprint).
+* **Model Checkpoint**: Stored in `model/phase5_reranker.pt` (< 1.0 MB lightweight footprint, 988 KB).
 * **Network Architecture**: 4-stage convolutional feature extractor ($32 \rightarrow 64 \rightarrow 128 \rightarrow 256$ channels) with Batch Normalization, ReLU activations, $2 \times 2$ Max Pooling, Global Average Pooling (GAP), and a linear projection layer outputting a 64-dimensional $L_2$-normalized unit embedding ($\|z\|_2 = 1.0$).
 * **Training Objective**: Trained in `train.py` using Contrastive Cosine Margin Loss:  
   $$\mathcal{L}_{\text{contrastive}} = y \cdot (1 - \cos(z_1, z_2)) + (1 - y) \cdot \max(0, \cos(z_1, z_2) - m)^2, \quad m = 0.40$$  
   specifically mined on hard-negative pairs (adjacent repeating periodic columns/rows).
-* **Execution Mode**: Runs offline/CPU in real time ($\sim 15\text{ ms}$ per candidate crop) and is selectively activated only on ambiguous instances, preserving ultra-fast $672\text{ ms}$ overall throughput.
+* **Execution Mode**: Runs offline/CPU in real time ($\sim 15\text{ ms}$ per candidate crop) and is selectively activated only on ambiguous instances, preserving ultra-fast $0.964\text{ s}$ overall throughput.
 
-### 3.2 Fab Compute & Hardware Compatibility Rationale
+### 4.2 Fab Compute & Hardware Compatibility Rationale
 Deploying deep learning models onto commercial semiconductor fab inspection tools requires strict edge hardware compatibility:
-1. **Ultra-Lightweight Footprint (3.2 MB)**: Easily fits within low-power embedded cache memory on tool compute blades.
+1. **Ultra-Lightweight Footprint (< 1.0 MB / 988 KB)**: Easily fits within low-power embedded cache memory on tool compute blades.
 2. **Zero GPU Dependency**: Runs purely on host CPU using lightweight PyTorch / ONNX C++ runtime primitives without requiring dedicated GPU accelerators.
 3. **Sub-20ms Candidate Inference**: Processes each $128 \times 128$ candidate crop in $\sim 15\text{ ms}$, ensuring zero throughput bottlenecks during inline wafer inspection.
 
