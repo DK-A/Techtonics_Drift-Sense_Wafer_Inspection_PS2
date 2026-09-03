@@ -74,9 +74,9 @@ def main():
             embedder_model.eval()
             print(f"[ENGINE STATUS] Loaded Phase 5 Siamese Verifier ({weights_path}, CPU).")
         except Exception as e:
-            print(f"[ENGINE WARNING] Could not load model weights ({e}). Activating Pure Classical Fallback.")
+            print(f"[ENGINE WARNING] Could not load model weights: {e}")
     else:
-        print("[ENGINE STATUS: Defensive Fallback Active] Model weights not found. Running Classical 4-Phase Pure CPU Cascade.")
+        print("[ENGINE STATUS] Model weights not found. Running 4-phase classical cascade.")
 
     base_dir = os.path.dirname(os.path.abspath(input_csv))
 
